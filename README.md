@@ -4,7 +4,7 @@
 
 1) ***Linear Genetic Programming (LGP)***: A type of Genetic Programming (GP) where programs are represented as linear sequences of instructions, similar to machine code. LGP operates on a register-based architecture where instructions modify values stored in registers. Programs execute sequentially, and their evolution is driven by genetic operators such as mutation and crossover, which modify the instruction sequence to optimize performance.
 
-2) ***Conditionally Executed Instructions***: Operations that only execute if a specified condition is met, without requiring explicit branching. Instead of altering the flow of execution with jumps or branches, these instructions check a condition and either perform their operation or do nothing. This approach is widely used in some CPU architectures, such as x86 and ARM, where some instructions can be conditionally executed based on processor flags set by compare instructions
+2) ***Conditionally Executed Instructions***: Operations that only execute if a specified condition is met, without requiring explicit branching. Instead of altering the flow of execution with jumps or branches, these instructions check a condition and either perform their operation or do nothing. These type of instructions are found in many popular CPU architectures, such as x86 and ARM, where some instructions can be conditionally executed based on processor flags set by compare instructions.
 
 ### Current LGP Conditional Execution Model
 
