@@ -24,50 +24,39 @@ Additionally, the flag-setting and flag-dependent execution introduces a linear,
 
 ### Processor Flags
 
+|Name|Description                                      |
+|----|-------------------------------------------------|
+|N   |Set if the result of CMP is negtive (sign bit).  |
+|Z   |Set if the result of CMP is zero (all bits zero).|
+
 ### Processor Registers
 
-|Code       |Name|Description|
-|-----------|----|-----------|
-|```00000```|R0  |           |
-|```00001```|R1  |           |
-|```00010```|R2  |           |
-|```00011```|R3  |           |
-|```00100```|R4  |           |
-|```00101```|R5  |           |
-|```00110```|R6  |           |
-|```00111```|R7  |           |
-|```01000```|R8  |           |
-|```01001```|R9  |           |
-|```01010```|R10 |           |
-|```01011```|R11 |           |
-|```01100```|R12 |           |
-|```01101```|R13 |           |
-|```01110```|R14 |           |
-|```01111```|R15 |           |
-|```10000```|R16 |           |
-|```10001```|R17 |           |
-|```10010```|R18 |           |
-|```10011```|R19 |           |
-|```10100```|R20 |           |
-|```10101```|R21 |           |
-|```10110```|R22 |           |
-|```10111```|R23 |           |
-|```11000```|R24 |           |
-|```11001```|R25 |           |
-|```11010```|R26 |           |
-|```11011```|R27 |           |
-|```11100```|R28 |           |
-|```11101```|R29 |           |
-|```11110```|R30 |           |
-|```11111```|R31 |           |
+|Name|Description              |
+|----|-------------------------|
+|R0  |General purpose register.|
+|R1  |General purpose register.|
+|R2  |General purpose register.|
+|R3  |General purpose register.|
+|R4  |General purpose register.|
+|R5  |General purpose register.|
+|R6  |General purpose register.|
+|R7  |General purpose register.|
+|R8  |General purpose register.|
+|R9  |General purpose register.|
+|R10 |General purpose register.|
+|R11 |General purpose register.|
+|R12 |General purpose register.|
+|R13 |General purpose register.|
+|R14 |General purpose register.|
+|R15 |General purpose register.|
 
 ### Instruction Layout
 
-|```31          28```|```      27      ```|```26          24```|```23                19```|```18           14```|```13          0```|
+|```31          28```|```      27      ```|```26          24```|```23                20```|```19           16```|```15          0```|
 |--------------------|--------------------|--------------------|--------------------------|---------------------|-------------------|
 |```Operation Code```|```Immediate Flag```|```Condition Code```|```Destination Register```|```Source Register```|```Operand Value```|
 
-***Operation Code***: Specifies the operation to be performed.
+```Operation Code``` specifies the operation to be performed:
 
 |Code      |Name          |Description                      |
 |----------|--------------|---------------------------------|
@@ -88,34 +77,33 @@ Additionally, the flag-setting and flag-dependent execution introduces a linear,
 |```1110```|***RESERVED***|                                 |
 |```1111```|***RESERVED***|                                 |
 
-***Immediate Flag***: Indicates whether the ***Operand Value*** is a register or immediate value.
+```Immediate Flag``` indicates whether the ```Operand Value``` is a register or immediate value:
 
 |Flag   |Type           |
 |-------|---------------|
 |```0```|Register       |
 |```1```|Immediate Value|
 
-***Condition Code***: Defines conditions under which the instruction executes.
+```Condition Code``` specifies conditions under which the instruction executes:
 
-|Code     |Name          |Description              |Flag State                                   |
-|---------|--------------|-------------------------|---------------------------------------------|
-|```000```|UN            |Uncondition.             |Any or none set.                             |
-|```001```|LT            |Less than.               |***N*** set (CMP result < 0).                |
-|```010```|LE            |Less than or equal to.   |***N*** or ***Z*** set (CMP result <= 0).    |
-|```011```|EQ            |Equal to                 |***Z*** set (CMP result == 0).               |
-|```100```|NE            |Not equal to.            |***Z*** not set (CMP result != 0).           |
-|```101```|GE            |Greater than or equal to.|***N*** not set (CMP result >= 0).           |
-|```110```|GT            |Greater than.            |***N*** and ***Z*** not set (CMP result > 0).|
-|```111```|***RESERVED***|                         |                                                 |
+|Code     |Name          |Description                               |
+|---------|--------------|------------------------------------------|
+|```000```|UN            |Uncondition                               |
+|```001```|LT            |Less than (N flag set).                   |
+|```010```|LE            |Less than or equal to (N or Z flags set). |
+|```011```|EQ            |Equal to (Z flag set).                    |
+|```100```|NE            |Not equal to (Z flag not set).            |
+|```101```|GE            |Greater than or equal to (N flag not set).|
+|```110```|GT            |Greater than (N and Z flags not set).     |
+|```111```|***RESERVED***|                                          |
 
-***Destination Register***: The register where the result of the operation is stored.
+```Destination Register``` defines the register where the result of the operation is stored.
 
-***Source Register***: The register containing the first operand value.
+```Source Register``` defines the register containing the first operand value.
 
-***Operand Value***: Either the register containing the second operand value or an immediate value, depending on the ***Immediate Flag***.
+```Operand Value``` defines either the register containing the second operand value or an immediate value:
 
-|Type           |Bits Range  |
-|---------------|------------|
-|Register       |```13 - 9```|
-|Immediate Value|```13 - 0```|
-
+|Type           |Bits Range   |
+|---------------|-------------|
+|Register       |```15 - 12```|
+|Immediate Value|```15 -  0```|
