@@ -31,79 +31,60 @@ Additionally, the flag-setting and flag-dependent execution introduces a linear,
 
 ### Processor Registers
 
-|Name|Description              |
-|----|-------------------------|
-|R0  |General purpose register.|
-|R1  |General purpose register.|
-|R2  |General purpose register.|
-|R3  |General purpose register.|
-|R4  |General purpose register.|
-|R5  |General purpose register.|
-|R6  |General purpose register.|
-|R7  |General purpose register.|
-|R8  |General purpose register.|
-|R9  |General purpose register.|
-|R10 |General purpose register.|
-|R11 |General purpose register.|
-|R12 |General purpose register.|
-|R13 |General purpose register.|
-|R14 |General purpose register.|
-|R15 |General purpose register.|
+|      |Name|Description              |
+|------|----|-------------------------|
+|000000|R0  |General purpose register.|
+|000001|R1  |General purpose register.|
+|000010|R2  |General purpose register.|
+|...   |    |                         |
+|111101|R61 |General purpose register.|
+|111110|R62 |General purpose register.|
+|111111|R63 |General purpose register.|
 
 ### Instruction Layout
 
-|```31          28```|```      27      ```|```26          24```|```23                20```|```19           16```|```15          0```|
-|--------------------|--------------------|--------------------|--------------------------|---------------------|-------------------|
-|```Operation Code```|```Immediate Flag```|```Condition Code```|```Destination Register```|```Source Register```|```Operand Value```|
+|[31 - 28]  |[27]|[26 - 24]|[23 - 18]|[17 - 12]    |[11 - 0]      |
+|-----------|----|---------|---------|-------------|--------------|
+|Operation  |Type|Condition|Result   |First Operand|Second Operand|
 
-```Operation Code``` specifies the operation to be performed:
+***Operation***: The operation to be performed.
 
-|Code      |Name          |Description                      |
-|----------|--------------|---------------------------------|
-|```0000```|CMP           |Compare (subtract) and set flags.|
-|```0001```|ADD           |Signed integer addition.         |
-|```0010```|SUB           |Signed integer subtraction.      |
-|```0011```|MUL           |Signed integer multiplication.   |
-|```0100```|DIV           |Signed integer division.         |
-|```0101```|MOD           |Signed integer modulo.           |
-|```0110```|AND           |Bitwise AND.                     |
-|```0111```|NAN           |Bitwise NAND.                    |
-|```1000```|EOR           |Bitwise exclusive OR (XOR).      |
-|```1001```|IOR           |Bitwise inclusive OR.            |
-|```1010```|NOR           |Bitwise NOR.                     |
-|```1011```|LSH           |Bitwise logical left shift.      |
-|```1100```|RSH           |Bitwise logical right shift.     |
-|```1101```|***RESERVED***|                                 |
-|```1110```|***RESERVED***|                                 |
-|```1111```|***RESERVED***|                                 |
+|    |Name          |Description                      |
+|----|--------------|---------------------------------|
+|0000|CMP           |Compare (subtract) and set flags.|
+|0001|ADD           |Signed integer addition.         |
+|0010|SUB           |Signed integer subtraction.      |
+|0011|MUL           |Signed integer multiplication.   |
+|0100|DIV           |Signed integer division.         |
+|0101|MOD           |Signed integer modulo.           |
+|0110|MAX           |Signed integer maximum.          |
+|0111|MIN           |Signed integer minimum.          |
+|1000|AND           |Bitwise AND.                     |
+|1001|NAN           |Bitwise NAND.                    |
+|1010|EOR           |Bitwise exclusive OR (XOR).      |
+|1011|IOR           |Bitwise inclusive OR.            |
+|1100|NOR           |Bitwise NOR.                     |
+|1101|LSH           |Bitwise logical left shift.      |
+|1110|RSH           |Bitwise logical right shift.     |
+|1111|***RESERVED***|                                 |
 
-```Immediate Flag``` indicates whether the ```Operand Value``` is a register or immediate value:
+***Type***: The ***Second Operand*** type, ```0``` for register number, ```1``` for signed immediate value.
 
-|Flag   |Type           |
-|-------|---------------|
-|```0```|Register       |
-|```1```|Immediate Value|
+***Condition Code***: The conditions under which the instruction executes.
 
-```Condition Code``` specifies conditions under which the instruction executes:
+|   |Name          |Description                               |
+|---|--------------|------------------------------------------|
+|000|UN            |Uncondition                               |
+|001|LT            |Less than (N flag set).                   |
+|010|LE            |Less than or equal to (N or Z flags set). |
+|011|EQ            |Equal to (Z flag set).                    |
+|100|NE            |Not equal to (Z flag not set).            |
+|101|GE            |Greater than or equal to (N flag not set).|
+|110|GT            |Greater than (N and Z flags not set).     |
+|111|***RESERVED***|                                          |
 
-|Code     |Name          |Description                               |
-|---------|--------------|------------------------------------------|
-|```000```|UN            |Uncondition                               |
-|```001```|LT            |Less than (N flag set).                   |
-|```010```|LE            |Less than or equal to (N or Z flags set). |
-|```011```|EQ            |Equal to (Z flag set).                    |
-|```100```|NE            |Not equal to (Z flag not set).            |
-|```101```|GE            |Greater than or equal to (N flag not set).|
-|```110```|GT            |Greater than (N and Z flags not set).     |
-|```111```|***RESERVED***|                                          |
+***Result***: The register number for the result.
 
-```Destination Register``` defines the register where the result of the operation is stored.
+***First Operand***: The register number for the first operand.
 
-```Source Register``` defines the register containing the first operand value.
-
-```Operand Value``` defines either the register containing the second operand value or an immediate value:
-
-|Type           |Bits Range   |
-|---------------|-------------|
-|Register       |```15 - 12```|
-|Immediate Value|```15 -  0```|
+***Second Operand***: Either the register number [5 - 0] or the signed immediate value [11 - 0] for the second operand.
