@@ -85,8 +85,8 @@ A more stable alternative uses conditionally executed instructions. These instru
 |110      |Greater than.            |N and Z flags not set.|
 |111      |Overflow.                |O flag set.           |
 
-#### RESULT - Register number.
+#### RESULT - Register to store result to.
 
-#### FIRST OPERAND - Register number.
+#### FIRST OPERAND - Register to load operand from.
 
-#### SECOND OPERAND - Register number or immediate value (based on TYPE).
+#### SECOND OPERAND - Register to load operand from, or immediate value (based on TYPE).
