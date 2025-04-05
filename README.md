@@ -36,7 +36,7 @@ A more stable alternative uses conditionally executed instructions. These instru
 |---------|----|----|---------|-------|-------------|--------------|
 |OPERATION|TYPE|SET |CONDITION|RESULT |FIRST OPERAND|SECOND OPERAND|
 
-#### OPERATION - The operation to be executed:
+#### OPERATION - What operation to execute:
 
 |OPERATION|Description                   |Details                  |
 |---------|------------------------------|-------------------------|
@@ -65,7 +65,7 @@ A more stable alternative uses conditionally executed instructions. These instru
 |0   |Register number.|Bits [4:0]. |
 |1   |Immediate value.|Bits [11:0].|
 
-#### SET - Whether to set processor flags:
+#### SET - Whether to set the processor flags:
 
 |SET|Description      |
 |---|-----------------|
@@ -85,8 +85,8 @@ A more stable alternative uses conditionally executed instructions. These instru
 |110      |Greater than.            |N and Z flags not set.|
 |111      |Overflow.                |O flag set.           |
 
-### RESULT - The register number to store result.
+#### RESULT - Register number.
 
-### FIRST OPERAND - The register number to load first operand.
+#### FIRST OPERAND - Register number.
 
-### SECOND OPERAND - The register number or immediate value (based on TYPE).
+#### SECOND OPERAND - Register number or immediate value (based on TYPE).
