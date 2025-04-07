@@ -16,77 +16,77 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 #### Processor Flags:
 
-|Flag|Description         |
-|----|--------------------|
-|N   |Result was negative.|
-|O   |Result overflowed.  |
-|Z   |Result was zero.    |
+|Flag|Description        |
+|----|-------------------|
+|N   |Result was negative|
+|O   |Result overflowed  |
+|Z   |Result was zero    |
 
 #### Processor Registers:
 
-|Register|Description     |
-|--------|----------------|
-|00000   |General purpose.|
-|...     |                |
-|11111   |General purpose.|
+|Register|Description    |
+|--------|---------------|
+|00000   |General purpose|
+|...     |               |
+|11111   |General purpose|
 
 #### Instruction Format:
 
-|[31:27]  |[26]|[25]|[24:22]  |[21:17]|[16:12]      |[11:0]        |
-|---------|----|----|---------|-------|-------------|--------------|
-|OPERATION|TYPE|SET |CONDITION|RESULT |FIRST OPERAND|SECOND OPERAND|
+|[31:27]  |[26]     |[25]    |[24:22]  |[21:17]    |[16:12]|[11:0] |
+|---------|---------|--------|---------|-----------|-------|-------|
+|Operation|Immediate|SetFlags|Condition|Destination|Source1|Source2|
 
-#### OPERATION - What operation to execute:
+#### Operation - Operation to Execute:
 
-|OPERATION|Description                   |Details                  |
-|---------|------------------------------|-------------------------|
-|00000    |Signed integer addition.      |Signed immediate value.  |
-|00001    |Signed integer subtraction.   |Signed immediate value.  |
-|00010    |Signed integer multiplication.|Signed immediate value.  |
-|00011    |Signed integer division.      |Signed immediate value.  |
-|00100    |Signed integer modulo.        |Signed immediate value.  |
-|00101    |Signed integer maximum.       |Signed immediate value.  |
-|00110    |Signed integer minimum.       |Signed immediate value.  |
-|00111    |Bitwise AND.                  |Unsigned immediate value.|
-|01000    |Bitwise NAND.                 |Unsigned immediate value.|
-|01001    |Bitwise exclusive OR (XOR).   |Unsigned immediate value.|
-|01010    |Bitwise inclusive OR.         |Unsigned immediate value.|
-|01011    |Bitwise NOR.                  |Unsigned immediate value.|
-|01100    |Bitwise logical left shift.   |Unsigned immediate value.|
-|01101    |Bitwise logical right shift.  |Unsigned immediate value.|
-|01110    |No operation.                 |                         |
-|...      |                              |                         |
-|11111    |No operation.                 |                         |
+|Operation|Description                  |Details                 |
+|---------|-----------------------------|------------------------|
+|00000    |Signed integer addition      |Signed immediate value  |
+|00001    |Signed integer subtraction   |Signed immediate value  |
+|00010    |Signed integer multiplication|Signed immediate value  |
+|00011    |Signed integer division      |Signed immediate value  |
+|00100    |Signed integer modulo        |Signed immediate value  |
+|00101    |Signed integer maximum       |Signed immediate value  |
+|00110    |Signed integer minimum       |Signed immediate value  |
+|00111    |Bitwise AND                  |Unsigned immediate value|
+|01000    |Bitwise NAND                 |Unsigned immediate value|
+|01001    |Bitwise exclusive OR (XOR)   |Unsigned immediate value|
+|01010    |Bitwise inclusive OR         |Unsigned immediate value|
+|01011    |Bitwise NOR                  |Unsigned immediate value|
+|01100    |Bitwise logical left shift   |Unsigned immediate value|
+|01101    |Bitwise logical right shift  |Unsigned immediate value|
+|01110    |No operation                 |                        |
+|...      |                             |                        |
+|11111    |No operation                 |                        |
 
-#### TYPE - How the SECOND OPERAND is interpreted:
+#### Immediate - Source2 Immediate Value:
 
-|TYPE|Description     |Details     |
-|----|----------------|------------|
-|0   |Register number.|Bits [4:0]. |
-|1   |Immediate value.|Bits [11:0].|
+|Immediate|Description                  |
+|---------|-----------------------------|
+|0        |Source2 is a register        |
+|1        |Source2 is an immediate value|
 
-#### SET - Whether to set the processor flags:
+#### SetFlags - Set Processor Flags:
 
-|SET|Description      |
-|---|-----------------|
-|0  |Do not set flags.|
-|1  |Set flags.       |
+|SetFlags|Description              |
+|--------|-------------------------|
+|0       |Do not set flags         |
+|1       |Set flags after operation|
 
-#### CONDITION - When the instruction executes:
+#### Condition - Condition for Execution:
 
-|CONDITION|Description              |Details               |
-|---------|-------------------------|----------------------|
-|000      |Always.                  |Unconditional.        |
-|001      |Less than.               |N flag set.           |
-|010      |Less than or equal to.   |N or Z flags set.     |
-|011      |Equal to.                |Z flag set.           |
-|100      |Not equal to.            |Z flag not set.       |
-|101      |Greater than or equal to.|N flag not set.       |
-|110      |Greater than.            |N and Z flags not set.|
-|111      |Overflow.                |O flag set.           |
+|Condition|Description             |Details              |
+|---------|------------------------|---------------------|
+|000      |Always                  |Unconditional        |
+|001      |Less than               |N flag set           |
+|010      |Less than or equal to   |N or Z flags set     |
+|011      |Equal to                |Z flag set           |
+|100      |Not equal to            |Z flag not set       |
+|101      |Greater than or equal to|N flag not set       |
+|110      |Greater than            |N and Z flags not set|
+|111      |Overflow                |O flag set           |
 
-#### RESULT - Register to store result to.
+#### Destination - Destination register.
 
-#### FIRST OPERAND - Register to load operand from.
+#### Source1 - First operand register.
 
-#### SECOND OPERAND - Register to load operand from, or immediate value (based on TYPE).
+#### Source2 - Second operand register ([4:0]) or immediate value ([11:0]) based on Immediate field.
