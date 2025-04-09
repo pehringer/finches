@@ -14,79 +14,63 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 # Instruction Set Architecture
 
-#### Processor Flags:
-
-|Flag|Description        |
-|----|-------------------|
-|N   |Result was negative|
-|O   |Result overflowed  |
-|Z   |Result was zero    |
-
-#### Processor Registers:
-
-|Register|Description    |
-|--------|---------------|
-|00000   |General purpose|
-|...     |               |
-|11111   |General purpose|
+- Harvard Architecture
+- Stack Based Machine
+- Has Processor Flags:
+  + **N** (Negative)
+  + **Z** (Zero)
 
 #### Instruction Format:
 
-|[31:27]  |[26]     |[25]    |[24:22]  |[21:17]    |[16:12]|[11:0] |
-|---------|---------|--------|---------|-----------|-------|-------|
-|Operation|Immediate|SetFlags|Condition|Destination|Source1|Source2|
+|[39-37]  |[36-33]  |[32]     |[31-0]   |
+|---------|---------|---------|---------|
+|CONDITION|OPERATION|PEEKFLAGS|IMMEDIATE|
 
-#### Operation - Operation to Execute:
+#### CONDITION - Condition for Execution:
 
-|Operation|Description                  |Details                 |
-|---------|-----------------------------|------------------------|
-|00000    |Signed integer addition      |Signed immediate value  |
-|00001    |Signed integer subtraction   |Signed immediate value  |
-|00010    |Signed integer multiplication|Signed immediate value  |
-|00011    |Signed integer division      |Signed immediate value  |
-|00100    |Signed integer modulo        |Signed immediate value  |
-|00101    |Signed integer maximum       |Signed immediate value  |
-|00110    |Signed integer minimum       |Signed immediate value  |
-|00111    |Bitwise AND                  |Unsigned immediate value|
-|01000    |Bitwise NAND                 |Unsigned immediate value|
-|01001    |Bitwise exclusive OR (XOR)   |Unsigned immediate value|
-|01010    |Bitwise inclusive OR         |Unsigned immediate value|
-|01011    |Bitwise NOR                  |Unsigned immediate value|
-|01100    |Bitwise logical left shift   |Unsigned immediate value|
-|01101    |Bitwise logical right shift  |Unsigned immediate value|
-|01110    |No operation                 |                        |
-|...      |                             |                        |
-|11111    |No operation                 |                        |
+|CONDITION|Pseudocode        |Description             |
+|---------|------------------|------------------------|
+|000      |IF TRUE           |Always                  |
+|001      |IF N)             |Less than               |
+|010      |IF N OR Z         |Less than or equal to   |
+|011      |IF Z              |Equal to                |
+|100      |IF NOT Z          |Not equal to            |
+|101      |IF NOT N          |Greater than or equal to|
+|110      |IF NOT N AND NOT Z|Greater than            |
+|111      |IF FALSE          |Never                   |
 
-#### Immediate - Source2 Immediate Value:
+#### OPERATION - Operation to Execute:
 
-|Immediate|Description                  |
-|---------|-----------------------------|
-|0        |Source2 is a register        |
-|1        |Source2 is an immediate value|
+***NOTE***: Instructions are paired together so a least significant bit flip will translate to a similar or immediate version of the instruction.
 
-#### SetFlags - Set Processor Flags:
+***NOTE***: Instructions with the significant bit set (or a 4 letter mnemonic) will use the immediate field of the instruction.
 
-|SetFlags|Description              |
-|--------|-------------------------|
-|0       |Do not set flags         |
-|1       |Set flags after operation|
+|OPERATION|Mnemonic|Pseudocode                            |Description                      |
+|---------|--------|--------------------------------------|---------------------------------|
+|00000    |ADD     |PUSH(POP() + POP())                   |Floating point add               |
+|00001    |ADDI    |PUSH(POP() + IMMEDIATE)               |Floating point add immediate     |
+|00010    |SUB     |PUSH(POP() - (POP()))                 |Floating point subtract          |
+|00011    |SUBI    |PUSH(POP() - IMMEDIATE)               |Floating point subtract immediate|
+|00100    |MUL     |PUSH(POP() * POP())                   |Floating point multiply          |
+|00101    |MULI    |PUSH(POP() * IMMEDIATE)               |Floating point multiply immediate|
+|00110    |DIV     |PUSH(POP() / (POP()))                 |Floating point divide            |
+|00111    |DIVI    |PUSH(POP() / IMMEDIATE)               |Floating point divide immediate  |
+|01000    |MAX     |PUSH(MAX(POP(), POP()))               |Floating point maximum           | 
+|01001    |MAXI    |PUSH(MAX(POP(), IMMEDIATE))           |Floating point maximum immediate |
+|01010    |MIN     |PUSH(MIN(POP(), POP()))               |Floating point minimum           |
+|01011    |MINI    |PUSH(MIN(POP(), IMMEDIATE))           |Floating point minimum immediate |
+|01100    |POP     |POP()                                 |Pop                              |
+|01101    |PUSH    |PUSH(IMMEDIATE)                       |Push immediate                   |
+|01110    |SWP     |X = POP(); Y = POP(); PUSH(X); PUSH(Y)|Swaps top two items              |
+|01111    |PICK    |PUSH(STACK[TOP - IMMEDIATE])          |Push n-th item from the top      |
 
-#### Condition - Condition for Execution:
+#### PEEKFLAGS - Peek And Set Flags:
 
-|Condition|Description             |Details              |
-|---------|------------------------|---------------------|
-|000      |Always                  |Unconditional        |
-|001      |Less than               |N flag set           |
-|010      |Less than or equal to   |N or Z flags set     |
-|011      |Equal to                |Z flag set           |
-|100      |Not equal to            |Z flag not set       |
-|101      |Greater than or equal to|N flag not set       |
-|110      |Greater than            |N and Z flags not set|
-|111      |Overflow                |O flag set           |
+|PEEKFLAGS|Pseudocode                     |Description           |
+|---------|-------------------------------|----------------------|
+|0        |N = N; Z = Z                   |Do not set flags      |
+|1        |N = PEEK() < 0; Z = PEEK() == 0|Peek top and set flags|
 
-#### Destination - Destination register.
+#### IMMEDIATE -  Immediate Value:
 
-#### Source1 - First operand register.
-
-#### Source2 - Second operand register ([4:0]) or immediate value ([11:0]) based on Immediate field.
+Used by some instructions, unused by others.
