@@ -14,9 +14,9 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 # Instruction Set Architecture
 
-- Harvard Architecture
-- Stack Based Machine
-- Has Processor Flags:
+- [Harvard Architecture](https://en.wikipedia.org/wiki/Harvard_architecture)
+- [Stack Machine](https://en.wikipedia.org/wiki/Stack_machine)
+- Has [Processor Flags](https://en.wikipedia.org/wiki/Status_register):
   + **N** (Negative)
   + **Z** (Zero)
 
@@ -41,9 +41,9 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 #### OPERATION - Operation to Execute:
 
-***NOTE***: Instructions are paired together so a least significant bit flip will translate to a similar or immediate version of the instruction.
+**NOTE**: Instructions are paired together so a least significant bit flip will translate to a similar or immediate version of the instruction.
 
-***NOTE***: Instructions with the significant bit set (or a 4 letter mnemonic) will use the immediate field of the instruction.
+**NOTE**: Instructions with the significant bit set (or a 4 letter mnemonic) will use the immediate field of the instruction.
 
 |OPERATION|Mnemonic|Pseudocode                            |Description                      |
 |---------|--------|--------------------------------------|---------------------------------|
