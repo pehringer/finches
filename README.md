@@ -2,7 +2,7 @@
 
 ### Key Concepts
 
-1) **Linear Genetic Programming (LGP)**: A variant of Genetic Programming where programs are represented as linear sequences of instructions, resembling machine code. LGP operates on a register-based architecture, with each instruction modifying register values. Programs execute sequentially, and evolve through genetic operators like mutation and crossover, which alter the instruction sequence to optimize performance.
+1) **Linear Genetic Programming (LGP)**:  A variant of Genetic Programming where programs are represented as linear sequences of instructions, resembling machine code. LGP operates as a machine that processes these instructions sequentially, with each instruction modifying the program’s state. Programs evolve through genetic operators like mutation and crossover, which alter the instruction sequence to find discover solutions and optimize performance.
 
 2) **Conditionally Executed Instructions**: Instructions execute only if specific processor flags are active. These flags are set by previous operations. This technique, common in CPU architectures like x86 and ARM, avoids traditional branching by embedding control flow within instruction-level logic.
 
