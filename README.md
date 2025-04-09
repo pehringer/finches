@@ -28,16 +28,16 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 #### CONDITION - Condition for Execution:
 
-|CONDITION|Pseudocode        |Description             |
-|---------|------------------|------------------------|
-|000      |IF TRUE           |Always                  |
-|001      |IF N)             |Less than               |
-|010      |IF N OR Z         |Less than or equal to   |
-|011      |IF Z              |Equal to                |
-|100      |IF NOT Z          |Not equal to            |
-|101      |IF NOT N          |Greater than or equal to|
-|110      |IF NOT N AND NOT Z|Greater than            |
-|111      |IF FALSE          |Never                   |
+|CONDITION|Mnemonic|Pseudocode         |Description             |
+|---------|--------|-------------------|------------------------|
+|000      |        |IF(TRUE)           |Always                  |
+|001      |LT      |IF(N)              |Less than               |
+|010      |LE      |IF(N OR Z)         |Less than or equal to   |
+|011      |EQ      |IF(Z)              |Equal to                |
+|100      |NE      |IF(NOT Z)          |Not equal to            |
+|101      |GE      |IF(NOT N)          |Greater than or equal to|
+|110      |GT      |IF(NOT N AND NOT Z)|Greater than            |
+|111      |NV      |IF(FALSE)          |Never                   |
 
 #### OPERATION - Operation to Execute:
 
@@ -66,10 +66,10 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 #### PEEKFLAGS - Peek And Set Flags:
 
-|PEEKFLAGS|Pseudocode                     |Description           |
-|---------|-------------------------------|----------------------|
-|0        |N = N; Z = Z                   |Do not set flags      |
-|1        |N = PEEK() < 0; Z = PEEK() == 0|Peek top and set flags|
+|PEEKFLAGS|Mnemonic|Pseudocode                     |Description           |
+|---------|--------|-------------------------------|----------------------|
+|0        |        |N = N; Z = Z                   |Do not set flags      |
+|1        |PF      |N = PEEK() < 0; Z = PEEK() == 0|Peek top and set flags|
 
 #### IMMEDIATE -  Immediate Value:
 
