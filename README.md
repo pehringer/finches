@@ -1,4 +1,4 @@
-# Linear Genetic Programming
+# Function Generator (fungen)
 
 ### Key Concepts
 
