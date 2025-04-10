@@ -1,19 +1,19 @@
-package main
+package fungen
 
 import (
 	"fmt"
 	"unsafe"
 )
 
-type machine struct {
+type Machine struct {
 	stack []float32
 	flags byte // bit 0 = Z, bit 1 = N
 }
 
-func setInputs(inputs []float32) *machine {
+func SetInputs(inputs []float32) *Machine {
 	stack := make([]float32, len(inputs))
 	copy(stack, inputs)
-	return &machine {
+	return &Machine {
 		stack: stack,
 		flags: 0x00,
 	}
@@ -27,7 +27,7 @@ func asFloat32(i int32) float32 {
 	return *(*float32)(unsafe.Pointer(&i))
 }
 
-func (m *machine) execute(instruction [5]byte) error {
+func (m *Machine) Execute(instruction [5]byte) error {
 	switch instruction[0] & 0xE0 {
 	case 0x00:
 	case 0x20: // LT
@@ -180,13 +180,9 @@ func (m *machine) execute(instruction [5]byte) error {
 	return nil
 }
 
-func (m *machine) getOutputs() []float32 {
+func (m *Machine) GetOutputs() []float32 {
 	outputs := make([]float32, len(m.stack))
 	copy(outputs, m.stack)
 	return outputs
-}
-
-func main() {
-	fmt.Println("fungen")
 }
 
