@@ -26,7 +26,7 @@ func SetInputs(inputs []float32) *Machine {
 }
 
 func asInt32(b []byte) int32 {
-	return int32(b[0]) | int32(b[1])<<8 | int32(b[2])<<16 | int32(b[3])<<24
+	return int32(b[0])<<24 | int32(b[1])<<16 | int32(b[2])<<8 | int32(b[3])
 }
 
 func asFloat32(i int32) float32 {
