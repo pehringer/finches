@@ -300,16 +300,6 @@ func TestDIV(t *testing.T) {
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
 func TestErrorsDIVI(t *testing.T) {
 	in := []float32{}
 	m := SetInputs(in)
@@ -358,3 +348,269 @@ func TestDIVI(t *testing.T) {
 		t.Errorf("incorrect outputs")
 	}
 }
+
+func TestErrorsMAX(t *testing.T) {
+	in := []float32{0}
+	m := SetInputs(in)
+	op := [5]byte{0x10, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, ErrorStackUnderflow) {
+		t.Errorf("incorrect error")
+	}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, in) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestMAX(t *testing.T) {
+	in := []float32{0, 1, 1, 2, 3, 5}
+	m := SetInputs(in)
+	op := [5]byte{0x10, 0x40, 0x40, 0x40, 0x40}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{5}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestErrorsMAXI(t *testing.T) {
+	in := []float32{}
+	m := SetInputs(in)
+	op := [5]byte{0x12, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, ErrorStackUnderflow) {
+		t.Errorf("incorrect error")
+	}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, in) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestMAXI(t *testing.T) {
+	in := []float32{0, 1, 1, 2, 3, 5}
+	m := SetInputs(in)
+	op := [5]byte{0x12, 0x40, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x12, 0x40, 0x40, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x12, 0x40, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x12, 0x3F, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x12, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{0, 1, 1, 2, 3, 5}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestErrorsMIN(t *testing.T) {
+	in := []float32{0}
+	m := SetInputs(in)
+	op := [5]byte{0x14, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, ErrorStackUnderflow) {
+		t.Errorf("incorrect error")
+	}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, in) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestMIN(t *testing.T) {
+	in := []float32{0, 1, 1, 2, 3, 5}
+	m := SetInputs(in)
+	op := [5]byte{0x14, 0x40, 0x40, 0x40, 0x40}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{0}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestErrorsMINI(t *testing.T) {
+	in := []float32{}
+	m := SetInputs(in)
+	op := [5]byte{0x16, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, ErrorStackUnderflow) {
+		t.Errorf("incorrect error")
+	}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, in) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestMINI(t *testing.T) {
+	in := []float32{0, 1, 1, 2, 3, 5}
+	m := SetInputs(in)
+	op := [5]byte{0x16, 0x40, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x16, 0x40, 0x40, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x16, 0x40, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x16, 0x3F, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x16, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{0, 1, 1, 2, 3, 0}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestPUSH(t *testing.T) {
+	in := []float32{0, 1, 1, 2, 3, 5}
+	m := SetInputs(in)
+	op := [5]byte{0x1A, 0x40, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x1A, 0x40, 0x40, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x1A, 0x40, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x1A, 0x3F, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x1A, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{0, 1, 1, 2, 3, 5, 4, 3, 2, 1, 0}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestErrorsSWP(t *testing.T) {
+	in := []float32{0}
+	m := SetInputs(in)
+	op := [5]byte{0x1C, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, ErrorStackUnderflow) {
+		t.Errorf("incorrect error")
+	}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, in) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestSWP(t *testing.T) {
+	in := []float32{0, 1, 1, 2, 3, 5}
+	m := SetInputs(in)
+	op := [5]byte{0x1C, 0x40, 0x40, 0x40, 0x40}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{0, 1, 1, 2, 5, 3}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestErrorsPICK(t *testing.T) {
+	in := []float32{0, 1, 1, 2, 3, 5}
+	m := SetInputs(in)
+	op := [5]byte{0x1E, 0xBF, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, ErrorIndexOutOfBounds) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x1E, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, ErrorIndexOutOfBounds) {
+		t.Errorf("incorrect error")
+	}
+
+	op = [5]byte{0x1E, 0x40, 0xE0, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, ErrorIndexOutOfBounds) {
+		t.Errorf("incorrect error")
+	}
+
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, in) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestPICK(t *testing.T) {
+	in := []float32{0, 1, 1, 2, 3, 5}
+	m := SetInputs(in)
+	op := [5]byte{0x1E, 0x00, 0x00, 0x00, 0x04}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x1E, 0x00, 0x00, 0x00, 0x03}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x1E, 0x00, 0x00, 0x00, 0x02}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{0, 1, 1, 2, 3, 5, 1, 3, 1}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
