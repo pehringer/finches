@@ -1,4 +1,4 @@
-package fungen
+package vm
 
 import (
 	"errors"

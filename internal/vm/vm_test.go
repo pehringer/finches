@@ -1,4 +1,4 @@
-package fungen
+package vm
 
 import (
 	"errors"
@@ -614,3 +614,125 @@ func TestPICK(t *testing.T) {
 	}
 }
 
+func TestFlagsNegative(t *testing.T) {
+	in := []float32{0, -42}
+	m := SetInputs(in)
+	op := [5]byte{0x01, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x3A, 0x3F, 0x80, 0x00, 0x00} //LT PUSH 1
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x5A, 0x40, 0x00, 0x00, 0x00} //LE PUSH 2
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x7A, 0x40, 0x40, 0x00, 0x00} //EQ PUSH 3
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x9A, 0x40, 0x80, 0x00, 0x00} //NE PUSH 4
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xBA, 0x40, 0xA0, 0x00, 0x00} //GE PUSH 5
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xDA, 0x40, 0xC0, 0x00, 0x00} //GT PUSH 6
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xFA, 0x40, 0xE0, 0x00, 0x00} //NV PUSH 7
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{-42, 1, 2, 4}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestFlagsZero(t *testing.T) {
+	in := []float32{0, 0}
+	m := SetInputs(in)
+	op := [5]byte{0x01, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x3A, 0x3F, 0x80, 0x00, 0x00} //LT PUSH 1
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x5A, 0x40, 0x00, 0x00, 0x00} //LE PUSH 2
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x7A, 0x40, 0x40, 0x00, 0x00} //EQ PUSH 3
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x9A, 0x40, 0x80, 0x00, 0x00} //NE PUSH 4
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xBA, 0x40, 0xA0, 0x00, 0x00} //GE PUSH 5
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xDA, 0x40, 0xC0, 0x00, 0x00} //GT PUSH 6
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xFA, 0x40, 0xE0, 0x00, 0x00} //NV PUSH 7
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{0, 2, 3, 5}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
+
+func TestFlagsPositive(t *testing.T) {
+	in := []float32{0, 42}
+	m := SetInputs(in)
+	op := [5]byte{0x01, 0x00, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x3A, 0x3F, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x5A, 0x40, 0x00, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x7A, 0x40, 0x40, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0x9A, 0x40, 0x80, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xBA, 0x40, 0xA0, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xDA, 0x40, 0xC0, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	op = [5]byte{0xFA, 0x40, 0xE0, 0x00, 0x00}
+	if err := m.Execute(op); !errors.Is(err, nil) {
+		t.Errorf("incorrect error")
+	}
+	exp := []float32{42, 4, 5, 6}
+	if out := m.GetOutputs(); !reflect.DeepEqual(out, exp) {
+		t.Errorf("incorrect outputs")
+	}
+}
