@@ -14,63 +14,77 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 # Instruction Set Architecture
 
-- [Harvard Architecture](https://en.wikipedia.org/wiki/Harvard_architecture)
-- [Stack Machine](https://en.wikipedia.org/wiki/Stack_machine)
-- Has [Processor Flags](https://en.wikipedia.org/wiki/Status_register):
+- Flags:
   + **N** (Negative)
   + **Z** (Zero)
+- Registers:
+  + **R[0-255]**
+  + All immediate values are preloaded into registers before execution begins.
 
-#### Instruction Format:
+#### Instruction format:
 
-|[39-37]  |[36-33]  |[32]     |[31-0]   |
-|---------|---------|---------|---------|
-|CONDITION|OPERATION|PEEKFLAGS|IMMEDIATE|
+|[31-30]  |[29-25]  |[24]    |[23-16]    |[15-8] |[7-0]  |
+|---------|---------|--------|-----------|-------|-------|
+|CONDITION|OPERATION|SETFLAGS|DESTINATION|SOURCE1|SOURCE2|
 
-#### CONDITION - Condition for Execution:
+#### CONDITION - Condition for execution:
 
-|CONDITION|Mnemonic|Pseudocode         |Description             |
-|---------|--------|-------------------|------------------------|
-|000      |        |IF(TRUE)           |Always                  |
-|001      |LT      |IF(N)              |Less than               |
-|010      |LE      |IF(N OR Z)         |Less than or equal to   |
-|011      |EQ      |IF(Z)              |Equal to                |
-|100      |NE      |IF(NOT Z)          |Not equal to            |
-|101      |GE      |IF(NOT N)          |Greater than or equal to|
-|110      |GT      |IF(NOT N AND NOT Z)|Greater than            |
-|111      |NV      |IF(FALSE)          |Never                   |
+|CONDITION|Mnemonic|Pseudocode        |Description |
+|---------|--------|------------------|------------|
+|00	  |        |                  |Always	   |
+|01	  |LT	   |if N              |Less Than   |
+|10	  |GT	   |if not N and not Z|Greater Than|
+|11	  |EQ	   |if Z              |Equal To    |
 
-#### OPERATION - Operation to Execute:
+#### OPERATION - Operation to execute:
 
-**NOTE**: Instructions are paired together so a least significant bit flip will translate to a similar or immediate version of the instruction.
+|OPERATION|Mnemonic|Pseudocode                                      |Description                       |
+|---------|--------|------------------------------------------------|----------------------------------|
+|00000    |ADD     |R[DESTINATION] = R[SOURCE1] + R[SOURCE2]        |Floating Point Addition           |
+|00001    |SUB     |R[DESTINATION] = R[SOURCE1] - R[SOURCE2]        |Floating Point Subtraction        |
+|00010    |MUL     |R[DESTINATION] = R[SOURCE1] * R[SOURCE2]        |Floating Point Multiplication     |
+|00011    |DIV     |R[DESTINATION] = R[SOURCE1] / R[SOURCE2]        |Floating Point Protected Division |
+|00100    |MAX     |R[DESTINATION] = maximum(R[SOURCE1], R[SOURCE2])|Floating Point Maximum            |
+|00101    |MIN     |R[DESTINATION] = minimum(R[SOURCE1], R[SOURCE2])|Floating Point Minimum            |
+|00110    |ABD     |R[DESTINATION] = |R[SOURCE1] - R[SOURCE2]|      |Floating Point Absolute Difference|
+|00111    |AVG     |R[DESTINATION] = (R[SOURCE1] + R[SOURCE2]) / 2  |Floating Point Average            |
+|01000    |NOP     |                                                |No Operation                      |
+|01001    |NOP     |                                                |No Operation                      |
+|01010    |NOP     |                                                |No Operation                      |
+|01011    |NOP     |                                                |No Operation                      |
+|01100    |NOP     |                                                |No Operation                      |
+|01101    |NOP     |                                                |No Operation                      |
+|01110    |NOP     |                                                |No Operation                      |
+|01111    |NOP     |                                                |No Operation                      |
+|10000    |NOP     |                                                |No Operation                      |
+|10001    |NOP     |                                                |No Operation                      |
+|10010    |NOP     |                                                |No Operation                      |
+|10011    |NOP     |                                                |No Operation                      |
+|10100    |NOP     |                                                |No Operation                      |
+|10101    |NOP     |                                                |No Operation                      |
+|10110    |NOP     |                                                |No Operation                      |
+|10111    |NOP     |                                                |No Operation                      |
+|11000    |NOP     |                                                |No Operation                      |
+|11001    |NOP     |                                                |No Operation                      |
+|11010    |NOP     |                                                |No Operation                      |
+|11011    |NOP     |                                                |No Operation                      |
+|11100    |NOP     |                                                |No Operation                      |
+|11101    |NOP     |                                                |No Operation                      |
+|11110    |NOP     |                                                |No Operation                      |
+|11111    |NOP     |                                                |No Operation                      |
 
-**NOTE**: Instructions with the significant bit set (or a 4 letter mnemonic) will use the immediate field of the instruction.
+#### SETFLAGS - Set flags based on the operations result:
 
-|OPERATION|Mnemonic|Pseudocode                            |Description                      |
-|---------|--------|--------------------------------------|---------------------------------|
-|0000     |ADD     |PUSH(POP() + POP())                   |Floating point add               |
-|0001     |ADDI    |PUSH(POP() + IMMEDIATE)               |Floating point add immediate     |
-|0010     |SUB     |PUSH(POP() - (POP()))                 |Floating point subtract          |
-|0011     |SUBI    |PUSH(POP() - IMMEDIATE)               |Floating point subtract immediate|
-|0100     |MUL     |PUSH(POP() * POP())                   |Floating point multiply          |
-|0101     |MULI    |PUSH(POP() * IMMEDIATE)               |Floating point multiply immediate|
-|0110     |DIV     |PUSH(POP() / (POP()))                 |Floating point divide            |
-|0111     |DIVI    |PUSH(POP() / IMMEDIATE)               |Floating point divide immediate  |
-|1000     |MAX     |PUSH(MAX(POP(), POP()))               |Floating point maximum           | 
-|1001     |MAXI    |PUSH(MAX(POP(), IMMEDIATE))           |Floating point maximum immediate |
-|1010     |MIN     |PUSH(MIN(POP(), POP()))               |Floating point minimum           |
-|1011     |MINI    |PUSH(MIN(POP(), IMMEDIATE))           |Floating point minimum immediate |
-|1100     |POP     |POP()                                 |Pop                              |
-|1101     |PUSH    |PUSH(IMMEDIATE)                       |Push immediate                   |
-|1110     |SWP     |X = POP(); Y = POP(); PUSH(X); PUSH(Y)|Swaps top two items              |
-|1111     |PICK    |PUSH(STACK[TOP - IMMEDIATE])          |Push n-th item from the top      |
+**NOTE**: NOP (no operation) cannot set flags since it does not produce a result.
 
-#### PEEKFLAGS - Peek And Set Flags:
+|PEEKFLAGS|Mnemonic|Pseudocode                                     |Description           |
+|---------|--------|-----------------------------------------------|----------------------|
+|0        |        |                                               |Do not set flags	  |
+|1        |S	   |N = R[DESTINATION] < 0; Z = R[DESTINATION] == 0|Peek top and set flags|
 
-|PEEKFLAGS|Mnemonic|Pseudocode                     |Description           |
-|---------|--------|-------------------------------|----------------------|
-|0        |        |N = N; Z = Z                   |Do not set flags      |
-|1        |PF      |N = PEEK() < 0; Z = PEEK() == 0|Peek top and set flags|
+### DESTINATION - Destination register for the result.
 
-#### IMMEDIATE -  Immediate Value:
+### SOURCE1 - Source register of the first operand.
 
-Used by some instructions, unused by others.
+### SOURCE2 - Source register of the second operand.
+
