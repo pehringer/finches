@@ -1,9 +1,11 @@
 package vm
 
-type Machine struct {
-	flags     byte
-	registers []float32
-}
+type (
+	Machine struct {
+		flags     byte
+		registers []float32
+	}
+)
 
 const (
 	flagNone  = iota // 00
@@ -53,16 +55,24 @@ const (
 	operationNOP31      // 11111
 )
 
-func SetRegisters(immediates []float32) *Machine {
-	if len(immediates) < 1 || len(immediates) > 256 {
+func NewMachine(registers []float32) *Machine {
+	if len(registers) < 1 || len(registers) > 256 {
 		return nil
 	}
 	result := Machine {
 		flags:     flagNone,
-		registers: make([]float32, len(immediates)),
+		registers: make([]float32, len(registers)),
 	}
-	copy(result.registers, immediates)
+	copy(result.registers, registers)
 	return &result
+}
+
+func (m *Machine) SetRegister(destination int, value float32) {
+	m.registers[destination % len(m.registers)] = value
+}
+
+func (m *Machine) GetRegister(source int) float32 {
+	return m.registers[source % len(m.registers)]
 }
 
 func (m *Machine) GetRegisters() []float32 {
