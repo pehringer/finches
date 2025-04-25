@@ -4,7 +4,6 @@ import (
 	"github.com/pehringer/fungen/internal/ga"
 )
 
-
 // Definition:
 //   f(x, y) = 0.26 × (x² + y²) − 0.48 × x × y
 // Domain:
@@ -97,8 +96,62 @@ var himmelblauFunction []ga.Test = []ga.Test{
 	{Inputs: []float32{-3.0, 2.0},			Expected: []float32{10.0}},
 }
 
+// Definition:
+//   f(x, y) = 2x² − 1.05x⁴ + (x⁶)/6 + x × y + y²
+// Domain:
+//   x, y ∈ [−5, 5]
+// Global Minimum:
+//   f(0, 0) = 0
+// Characteristics:
+//   Non-convex with multiple local minima.
+var camelFunction []ga.Test = []ga.Test{
+	{Inputs: []float32{ 0.0,  0.0}, Expected: []float32{   0.000000}},
+	{Inputs: []float32{ 1.0,  1.0}, Expected: []float32{   3.116667}},
+	{Inputs: []float32{ 1.0, -1.0}, Expected: []float32{   1.116667}},
+	{Inputs: []float32{-1.0,  1.0}, Expected: []float32{   1.116667}},
+	{Inputs: []float32{-1.0, -1.0}, Expected: []float32{   3.116667}},
+	{Inputs: []float32{ 2.0,  2.0}, Expected: []float32{   9.866667}},
+	{Inputs: []float32{ 2.0, -2.0}, Expected: []float32{   1.866667}},
+	{Inputs: []float32{-2.0,  2.0}, Expected: []float32{   1.866667}},
+	{Inputs: []float32{-2.0, -2.0}, Expected: []float32{   9.866667}},
+	{Inputs: []float32{ 3.0,  3.0}, Expected: []float32{  72.450000}},
+	{Inputs: []float32{ 3.0, -3.0}, Expected: []float32{  54.450000}},
+	{Inputs: []float32{-3.0,  3.0}, Expected: []float32{  54.450000}},
+	{Inputs: []float32{-3.0, -3.0}, Expected: []float32{  72.450000}},
+	{Inputs: []float32{ 4.0,  1.0}, Expected: []float32{ 450.866669}},
+	{Inputs: []float32{ 1.0,  4.0}, Expected: []float32{  21.116667}},
+	{Inputs: []float32{-4.0, -1.0}, Expected: []float32{ 450.866669}},
+}
+
+// Definition:
+//   f(x, y) = [1 + (x + y + 1)² × (19 − 14x + 3x² − 14y + 6xy + 3y²)]
+//   × [30 + (2x − 3y)² × (18 − 32x + 12x² + 48y − 36xy + 27y²)]
+// Domain:
+//   x, y ∈ [−2, 2]
+// Global Minimum:
+//   f(0, −1) = 3
+// Characteristics:
+//   Complex landscape with multiple local minima
+var goldsteinPriceFunction []ga.Test = []ga.Test{
+	{Inputs: []float32{0.0, -1.0}, Expected: []float32{3.0}},
+	{Inputs: []float32{0.0,  2.0}, Expected: []float32{3.0}},
+	{Inputs: []float32{2.0, -1.0}, Expected: []float32{3.0}},
+	{Inputs: []float32{2.0,  2.0}, Expected: []float32{3.0}},
+	{Inputs: []float32{0.0,  0.0}, Expected: []float32{600.0}},
+	{Inputs: []float32{1.0,  1.0}, Expected: []float32{1876.0}},
+	{Inputs: []float32{-1.0, -1.0}, Expected: []float32{2100.0}},
+	{Inputs: []float32{1.0, -1.0}, Expected: []float32{7100.0}},
+	{Inputs: []float32{-2.0, -2.0}, Expected: []float32{24376.0}},
+	{Inputs: []float32{-2.0,  2.0}, Expected: []float32{956600.0}},
+	{Inputs: []float32{2.0, -2.0}, Expected: []float32{316600.0}},
+	{Inputs: []float32{2.0,  2.0}, Expected: []float32{76728.0}},
+	{Inputs: []float32{2.0,  0.0}, Expected: []float32{1736.0}},
+	{Inputs: []float32{0.0,  2.0}, Expected: []float32{224616.0}},
+	{Inputs: []float32{-2.0,  0.0}, Expected: []float32{126600.0}},
+	{Inputs: []float32{0.0, -2.0}, Expected: []float32{66600.0}},
+}
 
 
 func main() {
-	ga.Evolution(matyasFunction, 1.0, 8, 24, 10000)
+	ga.Evolution(himmelblauFunction, 0.5, 12, 48, 4096)
 }

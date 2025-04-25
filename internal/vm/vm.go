@@ -55,16 +55,21 @@ const (
 	operationNOP31      // 11111
 )
 
-func NewMachine(registers []float32) *Machine {
+func SetState(registers []float32) *Machine {
 	if len(registers) < 1 || len(registers) > 256 {
 		return nil
 	}
-	result := Machine {
-		flags:     flagNone,
+	m := &Machine{
 		registers: make([]float32, len(registers)),
 	}
-	copy(result.registers, registers)
-	return &result
+	m.flags = flagNone
+	copy(m.registers, registers)
+	return m
+}
+
+func (m *Machine) ResetState(registers []float32) {
+	m.flags = flagNone
+	copy(m.registers, registers)
 }
 
 func (m *Machine) SetRegister(destination int, value float32) {
@@ -73,12 +78,6 @@ func (m *Machine) SetRegister(destination int, value float32) {
 
 func (m *Machine) GetRegister(source int) float32 {
 	return m.registers[source % len(m.registers)]
-}
-
-func (m *Machine) GetRegisters() []float32 {
-	result := make([]float32, len(m.registers))
-	copy(result, m.registers)
-	return result
 }
 
 func (m *Machine) Execute(instruction uint32) {
