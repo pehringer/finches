@@ -25,38 +25,14 @@ const (
 	operationSUB        // 00001
 	operationMUL        // 00010
 	operationDIV        // 00011
-	operationMAX        // 00100
-	operationMIN        // 00101
-	operationABD        // 00110
-	operationAVG        // 00111
-	operationNOP8       // 01000
-	operationNOP9       // 01001
-	operationNOP10      // 01010
-	operationNOP11      // 01011
-	operationNOP12      // 01100
-	operationNOP13      // 01101
-	operationNOP14      // 01110
-	operationNOP15      // 01111
-	operationNOP16      // 10000
-	operationNOP17      // 10001
-	operationNOP18      // 10010
-	operationNOP19      // 10011
-	operationNOP20      // 10100
-	operationNOP21      // 10101
-	operationNOP22      // 10110
-	operationNOP23      // 10111
-	operationNOP24      // 11000
-	operationNOP25      // 11001
-	operationNOP26      // 11010
-	operationNOP27      // 11011
-	operationNOP28      // 11100
-	operationNOP29      // 11101
-	operationNOP30      // 11110
-	operationNOP31      // 11111
+	operationNOP4       // 00100
+	operationNOP5       // 00101
+	operationNOP6       // 00110
+	operationNOP7       // 00111
 )
 
 func SetState(registers []float32) *Machine {
-	if len(registers) < 1 || len(registers) > 256 {
+	if len(registers) < 1 || len(registers) > 64 {
 		return nil
 	}
 	m := &Machine{
@@ -73,20 +49,20 @@ func (m *Machine) ResetState(registers []float32) {
 }
 
 func (m *Machine) SetRegister(destination int, value float32) {
-	m.registers[destination % len(m.registers)] = value
+	m.registers[destination%len(m.registers)] = value
 }
 
 func (m *Machine) GetRegister(source int) float32 {
-	return m.registers[source % len(m.registers)]
+	return m.registers[source%len(m.registers)]
 }
 
 func (m *Machine) Execute(instruction uint32) {
-	condition := instruction >> 30 & 3
-	operation := instruction >> 25 & 31
-	setFlags := instruction >> 24 & 1 == 1
-	destination := int(instruction >> 16 & 255) % len(m.registers)
-	source1 := int(instruction >> 8 & 255) % len(m.registers)
-	source2 := int(instruction >> 0 & 255) % len(m.registers)
+	condition := instruction >> 22 & 3
+	operation := instruction >> 19 & 7
+	setFlags := instruction >> 18 & 1 == 1
+	destination := int(instruction >> 12 & 63) % len(m.registers)
+	source1 := int(instruction >> 6 & 63) % len(m.registers)
+	source2 := int(instruction >> 0 & 63) % len(m.registers)
 	switch {
 	case condition == conditionLT && m.flags != flagN:
 		return
@@ -110,70 +86,13 @@ func (m *Machine) Execute(instruction uint32) {
 			second = 1
 		}
 		result = first / second
-	case operationMAX:
-		result = first
-		if first < second {
-			result = second
-		}
-	case operationMIN:
-		result = first
-		if first > second {
-			result = second
-		}
-	case operationABD:
-		result = first - second
-		if result < 0 {
-			result = -result
-		}
-	case operationAVG:
-		result = (first + second) / 2
-	case operationNOP8:
+	case operationNOP4:
 		return
-	case operationNOP9:
+	case operationNOP5:
 		return
-	case operationNOP10:
+	case operationNOP6:
 		return
-	case operationNOP11:
-		return
-	case operationNOP12:
-		return
-	case operationNOP13:
-		return
-	case operationNOP14:
-		return
-	case operationNOP15:
-		return
-	case operationNOP16:
-		return
-	case operationNOP17:
-		return
-	case operationNOP18:
-		return
-	case operationNOP19:
-		return
-	case operationNOP20:
-		return
-	case operationNOP21:
-		return
-	case operationNOP22:
-		return
-	case operationNOP23:
-		return
-	case operationNOP24:
-		return
-	case operationNOP25:
-		return
-	case operationNOP26:
-		return
-	case operationNOP27:
-		return
-	case operationNOP28:
-		return
-	case operationNOP29:
-		return
-	case operationNOP30:
-		return
-	case operationNOP31:
+	case operationNOP7:
 		return
 	}
 	switch {

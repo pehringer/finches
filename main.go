@@ -10,5 +10,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	ga.Evolution(tests, 1000.0, 16, 128, 4096 * 4)
+	ga.Evolution(tests, 1000.0, 32, 256, 4096 * 8)
 }

@@ -29,7 +29,7 @@ func initialization(registers, instructions, programs int) []individual {
 			population[i].registers[j] = rand.Float32() * 20 - 10
 		}
 		for j := range population[i].instructions {
-			population[i].instructions[j] = rand.Uint32()
+			population[i].instructions[j] = uint32(rand.Intn(16777216))
 		}
 	}
 	return population
@@ -42,10 +42,10 @@ func selectionNeighbors(neighborhood int, population []individual) (*individual,
 }
 
 func crossoverSinglePoint(parent1, parent2, offspring *individual) {
-	i := rand.Intn(len(offspring.registers)+1)
+	i := rand.Intn(len(offspring.registers) + 1)
 	copy(offspring.registers[:i], parent1.registers[:i])
 	copy(offspring.registers[i:], parent2.registers[i:])
-	i = rand.Intn(len(offspring.instructions)+1)
+	i = rand.Intn(len(offspring.instructions) + 1)
 	copy(offspring.instructions[:i], parent1.instructions[:i])
 	copy(offspring.instructions[i:], parent2.instructions[i:])
 }
@@ -53,7 +53,7 @@ func crossoverSinglePoint(parent1, parent2, offspring *individual) {
 func mutationBitFlips(bits int, offspring *individual) {
 	i := rand.Intn(len(offspring.instructions))
 	for j := 0; j < bits; j++ {
-		offspring.instructions[i] ^= uint32(1) << rand.Intn(32)
+		offspring.instructions[i] ^= uint32(1) << rand.Intn(24)
 	}
 }
 
@@ -123,12 +123,15 @@ func Evolution(tests []Test, target float64, registers, instructions, programs i
 		for i := range population {
 			if population[i].fitness < best {
 				best = population[i].fitness
-				fmt.Println(best)
+				fmt.Println("error:", best)
 			}
 			if population[i].fitness <= target {
 				solution = &population[i]
 			}
 		}
+	}
+	for i := range solution.instructions {
+		fmt.Printf("instruction %v: %024b\n", i, solution.instructions[i])
 	}
 	m := vm.SetState(solution.registers)
 	for i := range tests {
@@ -138,6 +141,7 @@ func Evolution(tests []Test, target float64, registers, instructions, programs i
 		for j := range solution.instructions {
 			m.Execute(solution.instructions[j])
 		}
+		fmt.Print("answer: ")
 		for j := range tests[i].Expected {
 			fmt.Print(m.GetRegister(j))
 		}

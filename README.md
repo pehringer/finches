@@ -18,14 +18,14 @@ A more stable alternative uses conditionally executed instructions. These instru
   + **N** (Negative)
   + **Z** (Zero)
 - Registers:
-  + **R[0-255]**
+  + **R[0-63]**
   + All immediate values are preloaded into registers before execution begins.
 
 #### Instruction format:
 
-|[31-30]  |[29-25]  |[24]    |[23-16]    |[15-8] |[7-0]  |
-|---------|---------|--------|-----------|-------|-------|
-|CONDITION|OPERATION|SETFLAGS|DESTINATION|SOURCE1|SOURCE2|
+|[31-24] |[23-22]  |[21-19]  |[18]    |[17-12]    |[11-6] |[5-0]  |
+|--------|---------|---------|--------|-----------|-------|-------|
+|RESERVED|CONDITION|OPERATION|SETFLAGS|DESTINATION|SOURCE1|SOURCE2|
 
 #### CONDITION - Condition for execution:
 
@@ -38,40 +38,16 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 #### OPERATION - Operation to execute:
 
-|OPERATION|Mnemonic|Pseudocode                                      |Description                       |
-|---------|--------|------------------------------------------------|----------------------------------|
-|00000    |ADD     |R[DESTINATION] = R[SOURCE1] + R[SOURCE2]        |Floating Point Addition           |
-|00001    |SUB     |R[DESTINATION] = R[SOURCE1] - R[SOURCE2]        |Floating Point Subtraction        |
-|00010    |MUL     |R[DESTINATION] = R[SOURCE1] * R[SOURCE2]        |Floating Point Multiplication     |
-|00011    |DIV     |R[DESTINATION] = R[SOURCE1] / R[SOURCE2]        |Floating Point Protected Division |
-|00100    |MAX     |R[DESTINATION] = maximum(R[SOURCE1], R[SOURCE2])|Floating Point Maximum            |
-|00101    |MIN     |R[DESTINATION] = minimum(R[SOURCE1], R[SOURCE2])|Floating Point Minimum            |
-|00110    |ABD     |R[DESTINATION] = |R[SOURCE1] - R[SOURCE2]|      |Floating Point Absolute Difference|
-|00111    |AVG     |R[DESTINATION] = (R[SOURCE1] + R[SOURCE2]) / 2  |Floating Point Average            |
-|01000    |NOP     |                                                |No Operation                      |
-|01001    |NOP     |                                                |No Operation                      |
-|01010    |NOP     |                                                |No Operation                      |
-|01011    |NOP     |                                                |No Operation                      |
-|01100    |NOP     |                                                |No Operation                      |
-|01101    |NOP     |                                                |No Operation                      |
-|01110    |NOP     |                                                |No Operation                      |
-|01111    |NOP     |                                                |No Operation                      |
-|10000    |NOP     |                                                |No Operation                      |
-|10001    |NOP     |                                                |No Operation                      |
-|10010    |NOP     |                                                |No Operation                      |
-|10011    |NOP     |                                                |No Operation                      |
-|10100    |NOP     |                                                |No Operation                      |
-|10101    |NOP     |                                                |No Operation                      |
-|10110    |NOP     |                                                |No Operation                      |
-|10111    |NOP     |                                                |No Operation                      |
-|11000    |NOP     |                                                |No Operation                      |
-|11001    |NOP     |                                                |No Operation                      |
-|11010    |NOP     |                                                |No Operation                      |
-|11011    |NOP     |                                                |No Operation                      |
-|11100    |NOP     |                                                |No Operation                      |
-|11101    |NOP     |                                                |No Operation                      |
-|11110    |NOP     |                                                |No Operation                      |
-|11111    |NOP     |                                                |No Operation                      |
+|OPERATION|Mnemonic|Pseudocode                              |Description                       |
+|---------|--------|----------------------------------------|----------------------------------|
+|00000    |ADD     |R[DESTINATION] = R[SOURCE1] + R[SOURCE2]|Floating Point Addition           |
+|00001    |SUB     |R[DESTINATION] = R[SOURCE1] - R[SOURCE2]|Floating Point Subtraction        |
+|00010    |MUL     |R[DESTINATION] = R[SOURCE1] * R[SOURCE2]|Floating Point Multiplication     |
+|00011    |DIV     |R[DESTINATION] = R[SOURCE1] / R[SOURCE2]|Floating Point Protected Division |
+|00100    |NOP     |                                        |No Operation                      |
+|00101    |NOP     |                                        |No Operation                      |
+|00110    |NOP     |                                        |No Operation                      |
+|00111    |NOP     |                                        |No Operation                      |
 
 #### SETFLAGS - Set flags based on the operations result:
 
@@ -87,4 +63,5 @@ A more stable alternative uses conditionally executed instructions. These instru
 ### SOURCE1 - Source register of the first operand.
 
 ### SOURCE2 - Source register of the second operand.
+
 
