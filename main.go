@@ -6,9 +6,14 @@ import (
 )
 
 func main() {
-	tests, err := io.ReadTests("examples/GoldsteinPriceFunction.csv")
+	// f(x,y)= 0.26(x^2 + y^2) − 0.48xy
+	tests, err := io.ReadTests("examples/MatyasFunction.csv")
 	if err != nil {
 		panic(err)
 	}
-	ga.Evolution(tests, 1000.0, 32, 256, 4096 * 8)
+	solution := ga.Evolution(tests, 0.5, 10, 30, 9000)
+	err = io.WriteProgram("solution.asm", solution)
+	if err != nil {
+		panic(err)
+	}
 }

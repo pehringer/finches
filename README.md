@@ -53,10 +53,10 @@ A more stable alternative uses conditionally executed instructions. These instru
 
 **NOTE**: NOP (no operation) cannot set flags since it does not produce a result.
 
-|PEEKFLAGS|Mnemonic|Pseudocode                                     |Description           |
-|---------|--------|-----------------------------------------------|----------------------|
-|0        |        |                                               |Do not set flags	  |
-|1        |S	   |N = R[DESTINATION] < 0; Z = R[DESTINATION] == 0|Peek top and set flags|
+|PEEKFLAGS|Mnemonic|Pseudocode                                     |Description|
+|---------|--------|-----------------------------------------------|-----------|
+|0        |        |                                               |No         |
+|1        |S	   |N = R[DESTINATION] < 0; Z = R[DESTINATION] == 0|Set Flags  |
 
 ### DESTINATION - Destination register for the result.
 

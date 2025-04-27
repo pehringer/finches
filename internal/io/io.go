@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/pehringer/fungen/internal/ga"
+	"github.com/pehringer/fungen/internal/vm"
 )
 
 func readCSV(filename string) ([][]string, error) {
@@ -68,3 +69,62 @@ func ReadTests(filename string) ([]ga.Test, error) {
 	return result, nil
 }
 
+func parseInstruction(registers int, instruction uint32) string {
+	result := ""
+	switch instruction & vm.Condition {
+	case vm.ConditionAlways:
+		result += "  "
+	case vm.ConditionLT:
+		result += "LT"
+	case vm.ConditionGT:
+		result += "GT"
+	case vm.ConditionEQ:
+		result += "EQ"
+	}
+	switch instruction & vm.Operation {
+	case vm.OperationADD:
+		result += "ADD"
+	case vm.OperationSUB:
+		result += "SUB"
+	case vm.OperationMUL:
+		result += "MUL"
+	case vm.OperationDIV:
+		result += "DIV"
+	case vm.OperationNOP4:
+		return "  NOP\n"
+	case vm.OperationNOP5:
+		return "  NOP\n"
+	case vm.OperationNOP6:
+		return "  NOP\n"
+	case vm.OperationNOP7:
+		return "  NOP\n"
+	}
+	switch instruction & vm.SetFlags {
+	case vm.SetFlagsNo:
+		result += "  "
+	case vm.SetFlagsS:
+		result += "S "
+	}
+	destination := int((instruction & vm.Destination)>>12) % registers
+	result += fmt.Sprintf("R%02d, ", destination)
+	source1 := int((instruction & vm.Source1)>>6) % registers
+	result += fmt.Sprintf("R%02d, ", source1)
+	source2 := int((instruction & vm.Source2)>>0) % registers
+	result += fmt.Sprintf("R%02d\n", source2)
+	return result
+}
+
+func WriteProgram(filepath string, program *ga.Program) error {
+	assembly := ""
+	for i := range program.Registers {
+		assembly += fmt.Sprintf("R%02d %f\n", i, program.Registers[i])
+	}
+	for i := range program.Instructions {
+		assembly += parseInstruction(len(program.Registers), program.Instructions[i])
+	}
+	err := os.WriteFile(filepath, []byte(assembly), 0644)
+	if err != nil {
+		return fmt.Errorf("could not write file: %w", err)
+	}
+	return nil
+}

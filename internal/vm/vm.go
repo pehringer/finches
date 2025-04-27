@@ -8,27 +8,33 @@ type (
 )
 
 const (
-	flagNone  = iota // 00
-	flagZ            // 01
-	flagN            // 10
-)
+	flagNone = 0x00
+	flagZ    = 0x01
+	flagN    = 0x02
 
-const (
-	conditionAlways = iota // 00
-	conditionLT            // 01
-	conditionGT            // 10
-	conditionEQ            // 11
-)
+	Condition       = 0x00C00000
+	ConditionAlways = 0x00000000
+	ConditionLT     = 0x00400000
+	ConditionGT     = 0x00800000
+	ConditionEQ     = 0x00C00000
 
-const (
-	operationADD = iota // 00000
-	operationSUB        // 00001
-	operationMUL        // 00010
-	operationDIV        // 00011
-	operationNOP4       // 00100
-	operationNOP5       // 00101
-	operationNOP6       // 00110
-	operationNOP7       // 00111
+	Operation     = 0x00380000
+	OperationADD  = 0x00000000
+	OperationSUB  = 0x00080000
+	OperationMUL  = 0x00100000
+	OperationDIV  = 0x00180000
+	OperationNOP4 = 0x00200000
+	OperationNOP5 = 0x00280000
+	OperationNOP6 = 0x00300000
+	OperationNOP7 = 0x00380000
+
+	SetFlags   = 0x00040000
+	SetFlagsNo = 0x00000000
+	SetFlagsS  = 0x00040000
+
+	Destination = 0x0003F000
+	Source1     = 0x00000FC0
+	Source2     = 0x0000003F
 )
 
 func SetState(registers []float32) *Machine {
@@ -57,42 +63,42 @@ func (m *Machine) GetRegister(source int) float32 {
 }
 
 func (m *Machine) Execute(instruction uint32) {
-	condition := instruction >> 22 & 3
-	operation := instruction >> 19 & 7
-	setFlags := instruction >> 18 & 1 == 1
-	destination := int(instruction >> 12 & 63) % len(m.registers)
-	source1 := int(instruction >> 6 & 63) % len(m.registers)
-	source2 := int(instruction >> 0 & 63) % len(m.registers)
+	condition := instruction & Condition
+	operation := instruction & Operation
+	setFlags := instruction & SetFlags == SetFlagsS
+	destination := int((instruction & Destination)>>12) % len(m.registers)
+	source1 := int((instruction & Source1)>>6) % len(m.registers)
+	source2 := int((instruction & Source2)>>0) % len(m.registers)
 	switch {
-	case condition == conditionLT && m.flags != flagN:
+	case condition == ConditionLT && m.flags != flagN:
 		return
-	case condition == conditionGT && m.flags != flagNone:
+	case condition == ConditionGT && m.flags != flagNone:
 		return
-	case condition == conditionEQ && m.flags != flagZ:
+	case condition == ConditionEQ && m.flags != flagZ:
 		return
 	}
 	result := m.registers[destination]
 	first := m.registers[source1]
 	second := m.registers[source2]
 	switch operation {
-	case operationADD:
+	case OperationADD:
 		result = first + second
-	case operationSUB:
+	case OperationSUB:
 		result = first - second
-	case operationMUL:
+	case OperationMUL:
 		result = first * second
-	case operationDIV:
+	case OperationDIV:
 		if second == 0 {
 			second = 1
 		}
 		result = first / second
-	case operationNOP4:
+	case OperationNOP4:
 		return
-	case operationNOP5:
+	case OperationNOP5:
 		return
-	case operationNOP6:
+	case OperationNOP6:
 		return
-	case operationNOP7:
+	case OperationNOP7:
 		return
 	}
 	switch {

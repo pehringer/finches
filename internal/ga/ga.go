@@ -12,84 +12,84 @@ type (
 		Inputs   []float32
 		Expected []float32
 	}
-	individual struct {
+	Program struct {
 		fitness      float64
-		registers    []float32
-		instructions []uint32
+		Registers    []float32
+		Instructions []uint32
 	}
 )
 
-func initialization(registers, instructions, programs int) []individual {
-	population := make([]individual, programs)
+func initialization(registers, instructions, programs int) []Program {
+	population := make([]Program, programs)
 	for i := range population {
 		population[i].fitness = math.MaxFloat64
-		population[i].registers = make([]float32, registers)
-		population[i].instructions = make([]uint32, instructions)
-		for j := range population[i].registers {
-			population[i].registers[j] = rand.Float32() * 20 - 10
+		population[i].Registers = make([]float32, registers)
+		population[i].Instructions = make([]uint32, instructions)
+		for j := range population[i].Registers {
+			population[i].Registers[j] = rand.Float32() * 20 - 10
 		}
-		for j := range population[i].instructions {
-			population[i].instructions[j] = uint32(rand.Intn(16777216))
+		for j := range population[i].Instructions {
+			population[i].Instructions[j] = uint32(rand.Intn(16777216))
 		}
 	}
 	return population
 }
 
-func selectionNeighbors(neighborhood int, population []individual) (*individual, *individual) {
+func selectionNeighbors(neighborhood int, population []Program) (*Program, *Program) {
 	i := rand.Intn(len(population))
 	j := (i + rand.Intn(neighborhood) + 1) % len(population)
 	return &population[i], &population[j]
 }
 
-func crossoverSinglePoint(parent1, parent2, offspring *individual) {
-	i := rand.Intn(len(offspring.registers) + 1)
-	copy(offspring.registers[:i], parent1.registers[:i])
-	copy(offspring.registers[i:], parent2.registers[i:])
-	i = rand.Intn(len(offspring.instructions) + 1)
-	copy(offspring.instructions[:i], parent1.instructions[:i])
-	copy(offspring.instructions[i:], parent2.instructions[i:])
+func crossoverSinglePoint(parent1, parent2, offspring *Program) {
+	i := rand.Intn(len(offspring.Registers) + 1)
+	copy(offspring.Registers[:i], parent1.Registers[:i])
+	copy(offspring.Registers[i:], parent2.Registers[i:])
+	i = rand.Intn(len(offspring.Instructions) + 1)
+	copy(offspring.Instructions[:i], parent1.Instructions[:i])
+	copy(offspring.Instructions[i:], parent2.Instructions[i:])
 }
 
-func mutationBitFlips(bits int, offspring *individual) {
-	i := rand.Intn(len(offspring.instructions))
+func mutationBitFlips(bits int, offspring *Program) {
+	i := rand.Intn(len(offspring.Instructions))
 	for j := 0; j < bits; j++ {
-		offspring.instructions[i] ^= uint32(1) << rand.Intn(24)
+		offspring.Instructions[i] ^= uint32(1) << rand.Intn(24)
 	}
 }
 
-func mutationPerturbation(min, max float32, offspring *individual) {
-	i := rand.Intn(len(offspring.registers))
-	offspring.registers[i] += rand.Float32() * (max - min) + min
+func mutationPerturbation(min, max float32, offspring *Program) {
+	i := rand.Intn(len(offspring.Registers))
+	offspring.Registers[i] += rand.Float32() * (max - min) + min
 }
 
-func mutationSwap(offspring *individual) {
-	i := rand.Intn(len(offspring.instructions))
-	j := rand.Intn(len(offspring.instructions))
-	value := offspring.instructions[i]
-	offspring.instructions[i] = offspring.instructions[j]
-	offspring.instructions[j] = value
+func mutationSwap(offspring *Program) {
+	i := rand.Intn(len(offspring.Instructions))
+	j := rand.Intn(len(offspring.Instructions))
+	value := offspring.Instructions[i]
+	offspring.Instructions[i] = offspring.Instructions[j]
+	offspring.Instructions[j] = value
 }
 
-func evaluation(tests []Test, candidate *individual) {
+func evaluation(tests []Test, candidate *Program) {
 	candidate.fitness = 0
-	m := vm.SetState(candidate.registers)
+	m := vm.SetState(candidate.Registers)
 	for i := range tests {
 		for j := range tests[i].Inputs {
 			m.SetRegister(j, tests[i].Inputs[j])
 		}
-		for j := range candidate.instructions {
-			m.Execute(candidate.instructions[j])
+		for j := range candidate.Instructions {
+			m.Execute(candidate.Instructions[j])
 		}
 		for j := range tests[i].Expected {
 			actual := float64(m.GetRegister(j))
 			expected := float64(tests[i].Expected[j])
 			candidate.fitness += math.Abs(actual - expected)
 		}
-		m.ResetState(candidate.registers)
+		m.ResetState(candidate.Registers)
 	}
 }
 
-func dualStrategy(tests []Test, population []individual) {
+func dualStrategy(tests []Test, population []Program) {
 	parent1, parent2 := selectionNeighbors(8, population)
 	offspring := parent1
 	if parent1.fitness < parent2.fitness {
@@ -112,41 +112,34 @@ func dualStrategy(tests []Test, population []individual) {
 	evaluation(tests, offspring)
 }
 
-func Evolution(tests []Test, target float64, registers, instructions, programs int) {
+func Evolution(tests []Test, target float64, registers, instructions, programs int) *Program {
 	population := initialization(registers, instructions, programs)
-	best := math.MaxFloat64
-	var solution *individual
-	for solution == nil {
+	solution := &population[0]
+	for solution.fitness > target {
 		for range len(population) {
 			dualStrategy(tests, population)
 		}
 		for i := range population {
-			if population[i].fitness < best {
-				best = population[i].fitness
-				fmt.Println("error:", best)
-			}
-			if population[i].fitness <= target {
+			if population[i].fitness < solution.fitness {
 				solution = &population[i]
+				fmt.Println("solution error:", solution.fitness)
 			}
 		}
 	}
-	for i := range solution.instructions {
-		fmt.Printf("instruction %v: %024b\n", i, solution.instructions[i])
-	}
-	m := vm.SetState(solution.registers)
+	m := vm.SetState(solution.Registers)
 	for i := range tests {
 		for j := range tests[i].Inputs {
 			m.SetRegister(j, tests[i].Inputs[j])
 		}
-		for j := range solution.instructions {
-			m.Execute(solution.instructions[j])
+		for j := range solution.Instructions {
+			m.Execute(solution.Instructions[j])
 		}
 		fmt.Print("answer: ")
 		for j := range tests[i].Expected {
 			fmt.Print(m.GetRegister(j))
 		}
 		fmt.Println()
-		m.ResetState(solution.registers)
+		m.ResetState(solution.Registers)
 	}
-	return
+	return solution
 }
