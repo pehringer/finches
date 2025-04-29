@@ -76,10 +76,18 @@ func parseInstruction(registers int, instruction uint32) string {
 		result += "  "
 	case vm.ConditionLT:
 		result += "LT"
-	case vm.ConditionGT:
-		result += "GT"
+	case vm.ConditionLE:
+		result += "LE"
 	case vm.ConditionEQ:
 		result += "EQ"
+	case vm.ConditionNE:
+		result += "NE"
+	case vm.ConditionGE:
+		result += "GE"
+	case vm.ConditionGT:
+		result += "GT"
+	case vm.ConditionNOP:
+		return "  NOP\n"
 	}
 	switch instruction & vm.Operation {
 	case vm.OperationADD:
@@ -90,14 +98,30 @@ func parseInstruction(registers int, instruction uint32) string {
 		result += "MUL"
 	case vm.OperationDIV:
 		result += "DIV"
-	case vm.OperationNOP4:
-		return "  NOP\n"
-	case vm.OperationNOP5:
-		return "  NOP\n"
-	case vm.OperationNOP6:
-		return "  NOP\n"
-	case vm.OperationNOP7:
-		return "  NOP\n"
+	case vm.OperationMOV4:
+		result += "MOV"
+	case vm.OperationMOV5:
+		result += "MOV"
+	case vm.OperationMOV6:
+		result += "MOV"
+	case vm.OperationMOV7:
+		result += "MOV"
+	case vm.OperationMOV8:
+		result += "MOV"
+	case vm.OperationMOV9:
+		result += "MOV"
+	case vm.OperationMOV10:
+		result += "MOV"
+	case vm.OperationMOV11:
+		result += "MOV"
+	case vm.OperationMOV12:
+		result += "MOV"
+	case vm.OperationMOV13:
+		result += "MOV"
+	case vm.OperationMOV14:
+		result += "MOV"
+	case vm.OperationMOV15:
+		result += "MOV"
 	}
 	switch instruction & vm.SetFlags {
 	case vm.SetFlagsNo:
@@ -106,9 +130,9 @@ func parseInstruction(registers int, instruction uint32) string {
 		result += "S "
 	}
 	destination := int((instruction & vm.Destination)>>12) % registers
-	result += fmt.Sprintf("R%02d, ", destination)
+	result += fmt.Sprintf("R%02d ", destination)
 	source1 := int((instruction & vm.Source1)>>6) % registers
-	result += fmt.Sprintf("R%02d, ", source1)
+	result += fmt.Sprintf("R%02d ", source1)
 	source2 := int((instruction & vm.Source2)>>0) % registers
 	result += fmt.Sprintf("R%02d\n", source2)
 	return result

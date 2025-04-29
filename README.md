@@ -18,45 +18,55 @@ A more stable alternative uses conditionally executed instructions. These instru
   + **N** (Negative)
   + **Z** (Zero)
 - Registers:
-  + **R[0-63]**
+  + **R[0-255]**
   + All immediate values are preloaded into registers before execution begins.
 
 #### Instruction format:
 
-|[31-24] |[23-22]  |[21-19]  |[18]    |[17-12]    |[11-6] |[5-0]  |
-|--------|---------|---------|--------|-----------|-------|-------|
-|RESERVED|CONDITION|OPERATION|SETFLAGS|DESTINATION|SOURCE1|SOURCE2|
+|[31]     |[30-28]  |[27-24]  |[23-16]    |[15-8] |[7-0]  |
+|---------|---------|---------|-----------|-------|-------|
+|SETFLAGS||CONDITION|OPERATION|DESTINATION|SOURCE1|SOURCE2|
+
+#### SETFLAGS - Set flags based on the operations result:
+
+|PEEKFLAGS|Mnemonic|Pseudocode                                     |Description|
+|---------|--------|-----------------------------------------------|-----------|
+|0        |        |N = N; Z = Z                                   |No         |
+|1        |S	   |N = R[DESTINATION] < 0; Z = R[DESTINATION] == 0|Set Flags  |
 
 #### CONDITION - Condition for execution:
 
-|CONDITION|Mnemonic|Pseudocode        |Description |
-|---------|--------|------------------|------------|
-|00	  |        |                  |Always	   |
-|01	  |LT	   |if N              |Less Than   |
-|10	  |GT	   |if not N and not Z|Greater Than|
-|11	  |EQ	   |if Z              |Equal To    |
+|CONDITION|Mnemonic|Pseudocode        |Description       |
+|---------|--------|------------------|------------------|
+|000      |        |if True           |Always            |
+|001      |LT      |if N              |Less Than         |
+|010      |LE      |if N or Z         |Less Than Equal   |
+|011      |EQ      |if Z              |Equal             |
+|100      |NE      |if not Z          |Not Equal         |
+|101      |GE      |if not N          |Greater Than Equal|
+|110      |GT      |if not N and not z|Greater Than      |
+|111      |NOP     |if false          |Never             |
 
 #### OPERATION - Operation to execute:
 
 |OPERATION|Mnemonic|Pseudocode                              |Description                       |
-|---------|--------|----------------------------------------|----------------------------------|
-|00000    |ADD     |R[DESTINATION] = R[SOURCE1] + R[SOURCE2]|Floating Point Addition           |
-|00001    |SUB     |R[DESTINATION] = R[SOURCE1] - R[SOURCE2]|Floating Point Subtraction        |
-|00010    |MUL     |R[DESTINATION] = R[SOURCE1] * R[SOURCE2]|Floating Point Multiplication     |
-|00011    |DIV     |R[DESTINATION] = R[SOURCE1] / R[SOURCE2]|Floating Point Protected Division |
-|00100    |NOP     |                                        |No Operation                      |
-|00101    |NOP     |                                        |No Operation                      |
-|00110    |NOP     |                                        |No Operation                      |
-|00111    |NOP     |                                        |No Operation                      |
-
-#### SETFLAGS - Set flags based on the operations result:
-
-**NOTE**: NOP (no operation) cannot set flags since it does not produce a result.
-
-|PEEKFLAGS|Mnemonic|Pseudocode                                     |Description|
-|---------|--------|-----------------------------------------------|-----------|
-|0        |        |                                               |No         |
-|1        |S	   |N = R[DESTINATION] < 0; Z = R[DESTINATION] == 0|Set Flags  |
+|------- -|--------|----------------------------------------|----------------------------------|
+|0000     |ADD     |R[DESTINATION] = R[SOURCE1] + R[SOURCE2]|Floating Point Addition           |
+|0001     |SUB     |R[DESTINATION] = R[SOURCE1] - R[SOURCE2]|Floating Point Subtraction        |
+|0010     |MUL     |R[DESTINATION] = R[SOURCE1] * R[SOURCE2]|Floating Point Multiplication     |
+|0011     |DIV     |R[DESTINATION] = R[SOURCE1] / R[SOURCE2]|Floating Point Protected Division |
+|0100     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|0101     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|0110     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|0111     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|1000     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|1001     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|1010     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|1011     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|1100     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|1101     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|1110     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
+|1111     |MOV     |R[DESTINATION] = R[SOURCE1]             |Move                              |
 
 ### DESTINATION - Destination register for the result.
 

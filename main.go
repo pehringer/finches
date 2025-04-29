@@ -11,7 +11,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	solution := ga.Evolution(tests, 0.5, 10, 30, 9000)
+	solution := ga.Evolution(tests, 1.0, 8, 64, 4096)
 	err = io.WriteProgram("solution.asm", solution)
 	if err != nil {
 		panic(err)

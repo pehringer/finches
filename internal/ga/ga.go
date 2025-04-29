@@ -29,7 +29,7 @@ func initialization(registers, instructions, programs int) []Program {
 			population[i].Registers[j] = rand.Float32() * 20 - 10
 		}
 		for j := range population[i].Instructions {
-			population[i].Instructions[j] = uint32(rand.Intn(16777216))
+			population[i].Instructions[j] = rand.Uint32()
 		}
 	}
 	return population
@@ -50,10 +50,27 @@ func crossoverSinglePoint(parent1, parent2, offspring *Program) {
 	copy(offspring.Instructions[i:], parent2.Instructions[i:])
 }
 
+func crossoverUniform(parent1, parent2, offspring *Program) {
+	for i := range offspring.Registers {
+		if i < len(parent1.Registers) && rand.Intn(2) == 1 {
+			offspring.Registers[i] = parent1.Registers[i]
+		} else if i < len(parent2.Registers) {
+			offspring.Registers[i] = parent2.Registers[i]
+		}
+	}
+	for i := range offspring.Instructions {
+		if i < len(parent1.Instructions) && rand.Intn(2) == 1 {
+			offspring.Instructions[i] = parent1.Instructions[i]
+		} else if i < len(parent2.Instructions) {
+			offspring.Instructions[i] = parent2.Instructions[i]
+		}
+	}
+}
+
 func mutationBitFlips(bits int, offspring *Program) {
 	i := rand.Intn(len(offspring.Instructions))
 	for j := 0; j < bits; j++ {
-		offspring.Instructions[i] ^= uint32(1) << rand.Intn(24)
+		offspring.Instructions[i] ^= uint32(1) << rand.Intn(32)
 	}
 }
 
@@ -65,9 +82,9 @@ func mutationPerturbation(min, max float32, offspring *Program) {
 func mutationSwap(offspring *Program) {
 	i := rand.Intn(len(offspring.Instructions))
 	j := rand.Intn(len(offspring.Instructions))
-	value := offspring.Instructions[i]
+	temporary := offspring.Instructions[i]
 	offspring.Instructions[i] = offspring.Instructions[j]
-	offspring.Instructions[j] = value
+	offspring.Instructions[j] = temporary
 }
 
 func evaluation(tests []Test, candidate *Program) {
@@ -95,7 +112,7 @@ func dualStrategy(tests []Test, population []Program) {
 	if parent1.fitness < parent2.fitness {
 		offspring = parent2
 	}
-	crossoverSinglePoint(parent1, parent2, offspring)
+	crossoverUniform(parent1, parent2, offspring)
 	percent := rand.Float32()
 	switch {
 	case percent < 0.35:
