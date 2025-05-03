@@ -15,22 +15,16 @@ type (
 	Program struct {
 		fitness      float64
 		Registers    []float32
-		Instructions []uint32
+		Instructions []uint16
 	}
 )
 
-func initialization(registers, instructions, programs int) []Program {
+func initialization(instructions, programs int) []Program {
 	population := make([]Program, programs)
 	for i := range population {
 		population[i].fitness = math.MaxFloat64
-		population[i].Registers = make([]float32, registers)
-		population[i].Instructions = make([]uint32, instructions)
-		for j := range population[i].Registers {
-			population[i].Registers[j] = rand.Float32() * 20 - 10
-		}
-		for j := range population[i].Instructions {
-			population[i].Instructions[j] = rand.Uint32()
-		}
+		population[i].Registers = make([]float32, vm.Registers)
+		population[i].Instructions = make([]uint16, instructions)
 	}
 	return population
 }
@@ -50,27 +44,10 @@ func crossoverSinglePoint(parent1, parent2, offspring *Program) {
 	copy(offspring.Instructions[i:], parent2.Instructions[i:])
 }
 
-func crossoverUniform(parent1, parent2, offspring *Program) {
-	for i := range offspring.Registers {
-		if i < len(parent1.Registers) && rand.Intn(2) == 1 {
-			offspring.Registers[i] = parent1.Registers[i]
-		} else if i < len(parent2.Registers) {
-			offspring.Registers[i] = parent2.Registers[i]
-		}
-	}
-	for i := range offspring.Instructions {
-		if i < len(parent1.Instructions) && rand.Intn(2) == 1 {
-			offspring.Instructions[i] = parent1.Instructions[i]
-		} else if i < len(parent2.Instructions) {
-			offspring.Instructions[i] = parent2.Instructions[i]
-		}
-	}
-}
-
 func mutationBitFlips(bits int, offspring *Program) {
-	i := rand.Intn(len(offspring.Instructions))
-	for j := 0; j < bits; j++ {
-		offspring.Instructions[i] ^= uint32(1) << rand.Intn(32)
+	for i := 0; i < bits; i++ {
+		j := rand.Intn(len(offspring.Instructions))
+		offspring.Instructions[j] ^= uint16(1) << rand.Intn(16)
 	}
 }
 
@@ -78,6 +55,17 @@ func mutationPerturbation(min, max float32, offspring *Program) {
 	i := rand.Intn(len(offspring.Registers))
 	offspring.Registers[i] += rand.Float32() * (max - min) + min
 }
+
+func mutationQuantization(scale float32, offspring *Program) {
+	i := rand.Intn(len(offspring.Registers))
+	scaled := int(offspring.Registers[i] * scale)
+	offspring.Registers[i] = float32(scaled) / scale
+}
+
+//func mutationAnnihilation(offspring *Program) {
+//	i := rand.Intn(len(offspring.Registers))
+//	offspring.Registers[i] = 0
+//}
 
 func mutationSwap(offspring *Program) {
 	i := rand.Intn(len(offspring.Instructions))
@@ -89,30 +77,30 @@ func mutationSwap(offspring *Program) {
 
 func evaluation(tests []Test, candidate *Program) {
 	candidate.fitness = 0
-	m := vm.SetState(candidate.Registers)
+	m := vm.Machine{}
 	for i := range tests {
+		m.Reset(candidate.Registers)
 		for j := range tests[i].Inputs {
-			m.SetRegister(j, tests[i].Inputs[j])
+			m.Set(j, tests[i].Inputs[j])
 		}
 		for j := range candidate.Instructions {
 			m.Execute(candidate.Instructions[j])
 		}
 		for j := range tests[i].Expected {
-			actual := float64(m.GetRegister(j))
+			actual := float64(m.Get(j))
 			expected := float64(tests[i].Expected[j])
 			candidate.fitness += math.Abs(actual - expected)
 		}
-		m.ResetState(candidate.Registers)
 	}
 }
 
 func dualStrategy(tests []Test, population []Program) {
-	parent1, parent2 := selectionNeighbors(8, population)
+	parent1, parent2 := selectionNeighbors(10, population)
 	offspring := parent1
 	if parent1.fitness < parent2.fitness {
 		offspring = parent2
 	}
-	crossoverUniform(parent1, parent2, offspring)
+	crossoverSinglePoint(parent1, parent2, offspring)
 	percent := rand.Float32()
 	switch {
 	case percent < 0.35:
@@ -123,14 +111,17 @@ func dualStrategy(tests []Test, population []Program) {
 		mutationBitFlips(3, offspring)
 	case percent < 0.90:
 		mutationPerturbation(-0.1, +0.1, offspring)
-	case percent < 1.00:
+	case percent < 0.99:
 		mutationSwap(offspring)
+	case percent < 1.00:
+		mutationQuantization(10.0, offspring)
+		//mutationAnnihilation(offspring)
 	}
 	evaluation(tests, offspring)
 }
 
-func Evolution(tests []Test, target float64, registers, instructions, programs int) *Program {
-	population := initialization(registers, instructions, programs)
+func Evolution(tests []Test, target float64, instructions, programs int) *Program {
+	population := initialization(instructions, programs)
 	solution := &population[0]
 	for solution.fitness > target {
 		for range len(population) {
@@ -143,20 +134,21 @@ func Evolution(tests []Test, target float64, registers, instructions, programs i
 			}
 		}
 	}
-	m := vm.SetState(solution.Registers)
+	m := vm.Machine{}
 	for i := range tests {
+		m.Reset(solution.Registers)
 		for j := range tests[i].Inputs {
-			m.SetRegister(j, tests[i].Inputs[j])
+			m.Set(j, tests[i].Inputs[j])
 		}
 		for j := range solution.Instructions {
 			m.Execute(solution.Instructions[j])
 		}
 		fmt.Print("answer: ")
 		for j := range tests[i].Expected {
-			fmt.Print(m.GetRegister(j))
+			fmt.Print(m.Get(j), " ")
 		}
 		fmt.Println()
-		m.ResetState(solution.Registers)
 	}
 	return solution
 }
+

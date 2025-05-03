@@ -69,82 +69,41 @@ func ReadTests(filename string) ([]ga.Test, error) {
 	return result, nil
 }
 
-func parseInstruction(registers int, instruction uint32) string {
-	result := ""
-	switch instruction & vm.Condition {
-	case vm.ConditionAlways:
-		result += "  "
-	case vm.ConditionLT:
-		result += "LT"
-	case vm.ConditionLE:
-		result += "LE"
-	case vm.ConditionEQ:
-		result += "EQ"
-	case vm.ConditionNE:
-		result += "NE"
-	case vm.ConditionGE:
-		result += "GE"
-	case vm.ConditionGT:
-		result += "GT"
-	case vm.ConditionNOP:
-		return "  NOP\n"
+func parseInstruction(instruction uint16) string {
+	state := instruction >> vm.State
+	operand := instruction & vm.Operand
+	switch instruction & vm.Opcode {
+	case vm.OpcodeLD:
+		return fmt.Sprintf("%02d: LD R%02d\n", state, operand)
+	case vm.OpcodeST:
+		return fmt.Sprintf("%02d: ST R%02d\n", state, operand)
+	case vm.OpcodeAD:
+		return fmt.Sprintf("%02d: AD R%02d\n", state, operand)
+	case vm.OpcodeSB:
+		return fmt.Sprintf("%02d: SB R%02d\n", state, operand)
+	case vm.OpcodeML:
+		return fmt.Sprintf("%02d: ML R%02d\n", state, operand)
+	case vm.OpcodeDV:
+		return fmt.Sprintf("%02d: DV R%02d\n", state, operand)
+	case vm.OpcodeLT:
+		return fmt.Sprintf("%02d: LT R%02d\n", state, operand)
+	case vm.OpcodeGT:
+		return fmt.Sprintf("%02d: GT R%02d\n", state, operand)
+	case vm.OpcodeEQ:
+		return fmt.Sprintf("%02d: EQ R%02d\n", state, operand)
+	case vm.OpcodeNE:
+		return fmt.Sprintf("%02d: NE R%02d\n", state, operand)
 	}
-	switch instruction & vm.Operation {
-	case vm.OperationADD:
-		result += "ADD"
-	case vm.OperationSUB:
-		result += "SUB"
-	case vm.OperationMUL:
-		result += "MUL"
-	case vm.OperationDIV:
-		result += "DIV"
-	case vm.OperationMOV4:
-		result += "MOV"
-	case vm.OperationMOV5:
-		result += "MOV"
-	case vm.OperationMOV6:
-		result += "MOV"
-	case vm.OperationMOV7:
-		result += "MOV"
-	case vm.OperationMOV8:
-		result += "MOV"
-	case vm.OperationMOV9:
-		result += "MOV"
-	case vm.OperationMOV10:
-		result += "MOV"
-	case vm.OperationMOV11:
-		result += "MOV"
-	case vm.OperationMOV12:
-		result += "MOV"
-	case vm.OperationMOV13:
-		result += "MOV"
-	case vm.OperationMOV14:
-		result += "MOV"
-	case vm.OperationMOV15:
-		result += "MOV"
-	}
-	switch instruction & vm.SetFlags {
-	case vm.SetFlagsNo:
-		result += "  "
-	case vm.SetFlagsS:
-		result += "S "
-	}
-	destination := int((instruction & vm.Destination)>>12) % registers
-	result += fmt.Sprintf("R%02d ", destination)
-	source1 := int((instruction & vm.Source1)>>6) % registers
-	result += fmt.Sprintf("R%02d ", source1)
-	source2 := int((instruction & vm.Source2)>>0) % registers
-	result += fmt.Sprintf("R%02d\n", source2)
-	return result
+	return fmt.Sprintf("    NOP\n")
 }
 
 func WriteProgram(filepath string, program *ga.Program) error {
 	assembly := ""
-	for i := range program.Registers {
+		for i := range program.Registers {
 		assembly += fmt.Sprintf("R%02d %f\n", i, program.Registers[i])
 	}
 	for i := range program.Instructions {
-		assembly += parseInstruction(len(program.Registers), program.Instructions[i])
+		assembly += parseInstruction(program.Instructions[i])
 	}
 	err := os.WriteFile(filepath, []byte(assembly), 0644)
 	if err != nil {
