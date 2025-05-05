@@ -1,4 +1,4 @@
-# mapper
+# Mapper
 
 Mapper is a library that uses linear genetic programming (LGP) to automatically synthesize functions that fit input-output data. It’s designed for discovering deterministic mappings, modeling mathematical relationships, and generating interpretable expressions from structured data.
 
