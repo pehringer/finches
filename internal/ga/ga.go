@@ -9,21 +9,21 @@ import (
 
 type (
 	Test struct {
-		Inputs   []float32
-		Expected []float32
+		Input  float64
+		Output float64
 	}
 	Program struct {
 		fitness      float64
-		Registers    []float32
+		Memory       []float64
 		Instructions []uint16
 	}
 )
 
-func initialization(instructions, programs int) []Program {
+func initialization(memory, instructions, programs int) []Program {
 	population := make([]Program, programs)
 	for i := range population {
 		population[i].fitness = math.MaxFloat64
-		population[i].Registers = make([]float32, vm.Registers)
+		population[i].Memory = make([]float64, memory)
 		population[i].Instructions = make([]uint16, instructions)
 	}
 	return population
@@ -36,9 +36,9 @@ func selectionNeighbors(neighborhood int, population []Program) (*Program, *Prog
 }
 
 func crossoverSinglePoint(parent1, parent2, offspring *Program) {
-	i := rand.Intn(len(offspring.Registers) + 1)
-	copy(offspring.Registers[:i], parent1.Registers[:i])
-	copy(offspring.Registers[i:], parent2.Registers[i:])
+	i := rand.Intn(len(offspring.Memory) + 1)
+	copy(offspring.Memory[:i], parent1.Memory[:i])
+	copy(offspring.Memory[i:], parent2.Memory[i:])
 	i = rand.Intn(len(offspring.Instructions) + 1)
 	copy(offspring.Instructions[:i], parent1.Instructions[:i])
 	copy(offspring.Instructions[i:], parent2.Instructions[i:])
@@ -51,21 +51,16 @@ func mutationBitFlips(bits int, offspring *Program) {
 	}
 }
 
-func mutationPerturbation(min, max float32, offspring *Program) {
-	i := rand.Intn(len(offspring.Registers))
-	offspring.Registers[i] += rand.Float32() * (max - min) + min
+func mutationPerturbation(min, max float64, offspring *Program) {
+	i := rand.Intn(len(offspring.Memory))
+	offspring.Memory[i] += rand.Float64() * (max - min) + min
 }
 
-func mutationQuantization(scale float32, offspring *Program) {
-	i := rand.Intn(len(offspring.Registers))
-	scaled := int(offspring.Registers[i] * scale)
-	offspring.Registers[i] = float32(scaled) / scale
+func mutationQuantization(scale float64, offspring *Program) {
+	i := rand.Intn(len(offspring.Memory))
+	scaled := int64(offspring.Memory[i] * scale)
+	offspring.Memory[i] = float64(scaled) / scale
 }
-
-//func mutationAnnihilation(offspring *Program) {
-//	i := rand.Intn(len(offspring.Registers))
-//	offspring.Registers[i] = 0
-//}
 
 func mutationSwap(offspring *Program) {
 	i := rand.Intn(len(offspring.Instructions))
@@ -79,18 +74,11 @@ func evaluation(tests []Test, candidate *Program) {
 	candidate.fitness = 0
 	m := vm.Machine{}
 	for i := range tests {
-		m.Reset(candidate.Registers)
-		for j := range tests[i].Inputs {
-			m.Set(j, tests[i].Inputs[j])
-		}
+		m.Set(tests[i].Input, candidate.Memory)
 		for j := range candidate.Instructions {
 			m.Execute(candidate.Instructions[j])
 		}
-		for j := range tests[i].Expected {
-			actual := float64(m.Get(j))
-			expected := float64(tests[i].Expected[j])
-			candidate.fitness += math.Abs(actual - expected)
-		}
+		candidate.fitness += math.Abs(m.Get() - tests[i].Output)
 	}
 }
 
@@ -115,13 +103,12 @@ func dualStrategy(tests []Test, population []Program) {
 		mutationSwap(offspring)
 	case percent < 1.00:
 		mutationQuantization(10.0, offspring)
-		//mutationAnnihilation(offspring)
 	}
 	evaluation(tests, offspring)
 }
 
-func Evolution(tests []Test, target float64, instructions, programs int) *Program {
-	population := initialization(instructions, programs)
+func Evolution(tests []Test, target float64, memory, instructions, programs int) *Program {
+	population := initialization(memory, instructions, programs)
 	solution := &population[0]
 	for solution.fitness > target {
 		for range len(population) {
@@ -136,18 +123,11 @@ func Evolution(tests []Test, target float64, instructions, programs int) *Progra
 	}
 	m := vm.Machine{}
 	for i := range tests {
-		m.Reset(solution.Registers)
-		for j := range tests[i].Inputs {
-			m.Set(j, tests[i].Inputs[j])
-		}
+		m.Set(tests[i].Input, solution.Memory)
 		for j := range solution.Instructions {
 			m.Execute(solution.Instructions[j])
 		}
-		fmt.Print("answer: ")
-		for j := range tests[i].Expected {
-			fmt.Print(m.Get(j), " ")
-		}
-		fmt.Println()
+		fmt.Println("answer:", m.Get())
 	}
 	return solution
 }

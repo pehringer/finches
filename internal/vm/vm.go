@@ -1,95 +1,165 @@
 package vm
 
+import (
+	"math"
+)
+
 type (
 	Machine struct {
-		state uint16
-		accumulator float32
-		registers [64]float32
+		flag byte
+		accumulator float64
+		memory []float64
 	}
 )
 
 const (
-	Registers = 64
+	flagNone = 0x0
+	flagZ    = 0x1
+	flagN    = 0x2
 
-	State = 10
-	Opcode  = 0x03C0
-	Operand = 0x003F
+	Condition   = 0xE000
+	ConditionLT = 0x2000
+	ConditionLE = 0x4000
+	ConditionEQ = 0x6000
+	ConditionNE = 0x8000
+	ConditionGE = 0xA000
+	ConditionGT = 0xC000
+	ConditionNV = 0xE000
 
-	OpcodeLD    = 0x0000
-	OpcodeST    = 0x0040
-	OpcodeAD    = 0x0080
-	OpcodeSB    = 0x00C0
-	OpcodeML    = 0x0100
-	OpcodeDV    = 0x0140
-	OpcodeLT    = 0x0180
-	OpcodeGT    = 0x01C0
-	OpcodeEQ    = 0x0200
-	OpcodeNE    = 0x0240
-	OpcodeNOP10 = 0x0280
-	OpcodeNOP11 = 0x02C0
-	OpcodeNOP12 = 0x0300
-	OpcodeNOP13 = 0x0340
-	OpcodeNOP14 = 0x0380
-	OpcodeNOP15 = 0x03C0
+	Operation   = 0x1E00
+	OperationLD = 0x0000
+	OperationST = 0x0200
+	OperationAD = 0x0400
+	OperationSB = 0x0600
+	OperationML = 0x0800
+	OperationDV = 0x0A00
+	OperationMX = 0x0C00
+	OperationMN = 0x0E00
+	OperationAB = 0x1000
+	OperationPW = 0x1200
+	OperationSQ = 0x1400
+	OperationEX = 0x1600
+	OperationLG = 0x1800
+	OperationSN = 0x1A00
+	OperationCS = 0x1C00
+	OperationTN = 0x1E00
+
+	SetFlag  = 0x0100
+	SetFlagS = 0x0100
+
+	Address = 0x00FF
 )
 
-func (m *Machine) Reset(registers []float32) {
-	m.state = 0
-	m.accumulator = 0
-	copy(m.registers[:], registers)
+func (m *Machine) Set(accumulator float64, memory []float64) {
+	m.flag = flagNone
+	m.accumulator = accumulator
+	if m.memory == nil {
+		m.memory = make([]float64, len(memory))
+	}
+	copy(m.memory, memory)
 }
 
-func (m *Machine) Set(register int, value float32) {
-		m.registers[register % Registers] = value
+func (m *Machine) Get() float64 {
+	return m.accumulator
 }
 
-func (m *Machine) Get(register int) float32 {
-		return m.registers[register % Registers]
+func guardZero(value float64) float64 {
+	if value == 0 {
+		return 1
+	}
+	return value
+}
+
+func guardEdge(value float64) float64 {
+	if math.IsNaN(value) || math.IsInf(value, 0) {
+		return 0
+	}
+	return value
 }
 
 func (m *Machine) Execute(instruction uint16) {
-	if m.state != instruction >> State {
+	condition := instruction & Condition
+	switch {
+	case condition == ConditionLT && m.flag != flagN:
+		return
+	case condition == ConditionLE && m.flag == flagNone:
+		return
+	case condition == ConditionEQ && m.flag != flagZ:
+		return
+	case condition == ConditionNE && m.flag == flagZ:
+		return
+	case condition == ConditionGE && m.flag == flagN:
+		return
+	case condition == ConditionGT && m.flag != flagNone:
+		return
+	case condition == ConditionNV:
 		return
 	}
-	switch instruction & Opcode {
-	case OpcodeLD:
-		m.accumulator = m.registers[int(instruction & Operand)]
-	case OpcodeST:
-		m.registers[int(instruction & Operand)] = m.accumulator
-	case OpcodeAD:
-		m.accumulator += m.registers[int(instruction & Operand)]
-	case OpcodeSB:
-		m.accumulator -= m.registers[int(instruction & Operand)]
-	case OpcodeML:
-		m.accumulator *= m.registers[int(instruction & Operand)]
-	case OpcodeDV:
-		protected := m.registers[int(instruction & Operand)]
-		if protected == 0 {
-			protected = 1
-		}
-		m.accumulator /= protected
-	case OpcodeLT:
-		if m.accumulator < 0 {
-				m.state = instruction & Operand
-		}
-	case OpcodeGT:
-		if m.accumulator > 0 {
-				m.state = instruction & Operand
-		}
-	case OpcodeEQ:
-		if m.accumulator == 0 {
-				m.state = instruction & Operand
-		}
-	case OpcodeNE:
-		if m.accumulator != 0 {
-				m.state = instruction & Operand
-		}
-	case OpcodeNOP10:
-	case OpcodeNOP11:
-	case OpcodeNOP12:
-	case OpcodeNOP13:
-	case OpcodeNOP14:
-	case OpcodeNOP15:
+	operation := instruction & Operation
+	switch operation {
+	case OperationLD:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator = m.memory[address]
+	case OperationST:
+		address := int(instruction & Address) % len(m.memory)
+		m.memory[address] = m.accumulator
+	case OperationAD:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator += m.memory[address]
+	case OperationSB:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator -= m.memory[address]
+	case OperationML:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator *= m.memory[address]
+	case OperationDV:
+		address := int(instruction & Address) % len(m.memory)
+		operand := m.memory[address]
+		m.accumulator /= guardZero(operand)
+	case OperationMX:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator = math.Max(m.accumulator, m.memory[address])
+	case OperationMN:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator = math.Min(m.accumulator, m.memory[address])
+	case OperationAB:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator = math.Abs(m.memory[address])
+	case OperationPW:
+		address := int(instruction & Address) % len(m.memory)
+		result := math.Pow(m.accumulator, m.memory[address])
+		m.accumulator = guardEdge(result)
+	case OperationSQ:
+		address := int(instruction & Address) % len(m.memory)
+		result := math.Sqrt(m.memory[address])
+		m.accumulator = guardEdge(result)
+	case OperationEX:
+		address := int(instruction & Address) % len(m.memory)
+		result := math.Exp(m.memory[address])
+		m.accumulator = guardEdge(result)
+	case OperationLG:
+		address := int(instruction & Address) % len(m.memory)
+		result := math.Log(m.memory[address])
+		m.accumulator = guardEdge(result)
+	case OperationSN:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator = math.Sin(m.memory[address])
+	case OperationCS:
+		address := int(instruction & Address) % len(m.memory)
+		m.accumulator = math.Cos(m.memory[address])
+	case OperationTN:
+		address := int(instruction & Address) % len(m.memory)
+		result := math.Tan(m.memory[address])
+		m.accumulator = guardEdge(result)
+	}
+	setFlag := instruction & SetFlag
+	switch {
+	case setFlag == SetFlagS && m.accumulator < 0:
+		m.flag = flagN
+	case setFlag == SetFlagS && m.accumulator == 0:
+		m.flag = flagZ
+	case setFlag == SetFlagS && m.accumulator > 0:
+		m.flag = flagNone
 	}
 	return
 }
