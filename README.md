@@ -4,11 +4,20 @@ Mapper is a library that uses linear genetic programming (LGP) to automatically 
 
 ## Use Cases
 
-1. **Reverse Engineering** – Infer hidden logic from input–output pairs, even when source code or hardware is unavailable. For example, Mapper can help uncover the rules behind proprietary black-box systems by modeling their behavior.
+1. **Reverse Engineering** - Infer hidden logic from input–output pairs, even when source code or hardware is unavailable. For example, Mapper can help uncover the rules behind proprietary black-box systems by modeling their behavior.
 
-2. **Data Compression** – Evolve compact functions that approximate large datasets. By replacing raw data with concise models, Mapper enables significant reductions in storage for structured, deterministic data.
+2. **Data Compression** - Evolve compact functions that approximate large datasets. By replacing raw data with concise models, Mapper enables significant reductions in storage for structured, deterministic data.
 
 ## Key Concepts
+
+- **Linear Genetic Programming (LGP)** – A form of genetic programming where programs are represented as linear sequences of instructions. These programs are evolved through mutation and selection to minimize a fitness function.
+
+- **Conditional Execution** – Individual instructions can be conditionally executed based on the results of prior instructions. This enables branching logic without requiring explicit control flow statements like jumps or branches.
+
+- **Accumulator Architecture** – Programs use a single accumulator register for all intermediate computations. This simplifies the instruction set while still allowing for complex operations through sequences of simpler operations.
+
+
+
 
 # Instruction Set Architecture
 
