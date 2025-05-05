@@ -1,6 +1,14 @@
 # Mapper
 
-Mapper is a library that uses linear genetic programming (LGP) to automatically synthesize functions that fit input-output data. It’s designed for discovering deterministic mappings, modeling mathematical relationships, and generating interpretable expressions from structured data.
+Mapper is a library that uses linear genetic programming (LGP) to automatically synthesize functions that fit input–output data. It’s designed for discovering deterministic mappings from structured data.
+
+## Use Cases
+
+1. **Reverse Engineering** – Infer hidden logic from input–output pairs, even when source code or hardware is unavailable. For example, Mapper can help uncover the rules behind proprietary black-box systems by modeling their behavior.
+
+2. **Data Compression** – Evolve compact functions that approximate large datasets. By replacing raw data with concise models, Mapper enables significant reductions in storage for structured, deterministic data.
+
+## Key Concepts
 
 # Instruction Set Architecture
 
