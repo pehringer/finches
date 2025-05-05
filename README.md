@@ -1,40 +1,37 @@
 # Mapper
 
-Mapper is a library that uses linear genetic programming (LGP) to automatically synthesize functions that fit input–output data. It’s designed for discovering deterministic mappings from structured data.
+Mapper is a library that uses linear genetic programming to automatically synthesize functions that fit input–output data. It’s designed for discovering deterministic mappings from structured data.
 
 ## Use Cases
 
-1. **Reverse Engineering** - Infer hidden logic from input–output pairs, even when source code or hardware is unavailable. For example, Mapper can help uncover the rules behind proprietary black-box systems by modeling their behavior.
+- **Reverse Engineering** - Infer hidden logic from input–output pairs, even when source code or hardware is unavailable. For example, Mapper can help uncover the rules behind proprietary black-box systems by modeling their behavior.
 
-2. **Data Compression** - Evolve compact functions that approximate large datasets. By replacing raw data with concise models, Mapper enables significant reductions in storage for structured, deterministic data.
+- **Data Compression** - Evolve compact functions that approximate large datasets. By replacing raw data with concise models, Mapper enables significant reductions in storage for structured, deterministic data.
 
 ## Key Concepts
 
-- **Linear Genetic Programming (LGP)** – A form of genetic programming where programs are represented as linear sequences of instructions. These programs are evolved through mutation and selection to minimize a fitness function.
+- **Linear Genetic Programming** - A form of genetic programming where programs are represented as linear sequences of instructions. These programs are evolved through mutation and selection to minimize a fitness function.
 
-- **Conditional Execution** – Individual instructions can be conditionally executed based on the results of prior instructions. This enables branching logic without requiring explicit control flow statements like jumps or branches.
+- **Conditional Execution** - Individual instructions can be conditionally executed based on the results of prior instructions. This enables branching logic without requiring explicit control flow statements like jumps or branches.
 
-- **Accumulator Architecture** – Programs use a single accumulator register for all intermediate computations. This simplifies the instruction set while still allowing for complex operations through sequences of simpler operations.
-
-
-
+- **Accumulator Architecture** - Programs use a single accumulator register for all intermediate computations. This simplifies the instruction set while still allowing for complex operations through sequences of simpler operations.
 
 # Instruction Set Architecture
 
-- Flag Register (**F**):
-  + Zero flag (**Z**) bit 0.
-  + Negative flag (**N**) bit 1.
-- Accumulator Register (**A**).
-- Memory (**M[0-255]**):
+- **A** - Accumulator register.
+- **F** - Flag register.
+  + **Z** - Zero flag.
+  + **N** - Negative flag.
+- **M[0-255]** - Memory.
   + Immediate values are preloaded into memory before execution.
 
-#### Instruction format:
+#### 16-Bit Instructions.
 
 |[15-13]  |[12-9]   |[8]    |[7-0]  |
 |---------|---------|-------|-------|
 |CONDITION|OPERATION|SETFLAG|ADDRESS|
 
-#### CONDITION: Condition for execution:
+#### CONDITION - Condition for execution.
 
 |CONDITION|Mnemonic|Pseudocode            |Description        |
 |---------|--------|----------------------|-------------------|
@@ -47,7 +44,7 @@ Mapper is a library that uses linear genetic programming (LGP) to automatically 
 |110      |GT      |if not N and not Z    |Greater than.      |
 |111      |NV      |if False              |Never              |
 
-#### OPERATION: Operation to execute:
+#### OPERATION - Operation to execute.
 
 |OPCODE|Mnemonic|Pseudocode            |Description              |
 |------|--------|----------------------|-------------------------|
@@ -68,7 +65,7 @@ Mapper is a library that uses linear genetic programming (LGP) to automatically 
 |1110  |CS      |A = cos(M[OPERAND])   |Consine.                 |
 |1111  |TN      |A = tan(M[OPERAND])   |Protected tangent.       |
 
-#### SETFLAG: Set flag register after execution:
+#### SETFLAG - Set flag register after execution.
 
 |SETFLAG|Mnemonic|Pseudocode            |Description|
 |-------|--------|----------------------|-----------|
