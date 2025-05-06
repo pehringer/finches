@@ -15,11 +15,16 @@ Mapper is a library that uses linear genetic programming to automatically synthe
   + Well suited for exploring large, rugged search spaces where traditional methods may struggle.
 
 - **Conditional Execution** – Individual instructions can be conditionally executed based on the results of prior instructions. This enables branching logic without requiring explicit control flow statements like jumps or branches.
-  - Traditional branch-based control flow is often brittle and prone to breaking under mutation or crossover. Conditional execution offers a more robust, more position-independent alternative.
-  - Reduces control flow complexity (shrinking the search space) while still supporting basic branching behaviors like piecewise logic through simple if-else structures.
+  + Traditional branch-based control flow is often brittle and prone to breaking under mutation or crossover. Conditional execution offers a more robust, more position-independent alternative.
+  + Reduces control flow complexity (shrinking the search space) while still supporting basic branching behaviors like piecewise logic through simple if-else structures.
 
+- **Accumulator Architecture** – Programs use a single accumulator register for all intermediate computations. This simplifies the instruction set while still allowing for complex operations through sequences of simpler ones.
+  - Encourages incremental evolution of functionality. Simple accumulator operations can be combined over generations into richer behaviors.
+  - Aligns naturally with a single‑input, single‑output programs. Write the input into the accumulator, run the instruction sequence, then read the output from the accumulator.
 
-- **Accumulator Architecture** - Programs use a single accumulator register for all intermediate computations. This simplifies the instruction set while still allowing for complex operations through sequences of simpler operations.
+## Novel Design
+
+The combination of accumulator-based computation and conditional instruction execution as the sole control flow mechanism offers a novel approach within the Linear Genetic Programming domain. It improves robustness under mutation and crossover, enables smoother evolution of complex behaviors, and aligns naturally with single-input/single-output problem domains.
 
 # Instruction Set Architecture
 
