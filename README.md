@@ -20,7 +20,7 @@ Mapper is a library that uses linear genetic programming to automatically synthe
 
 - **Accumulator Architecture** – Programs use a single accumulator register for all intermediate computations. This simplifies the instruction set while still allowing for complex operations through sequences of simpler ones.
   - Encourages incremental evolution of functionality. Simple accumulator operations can be combined over generations into richer behaviors.
-  - Aligns naturally with a single‑input, single‑output programs. Write the input into the accumulator, run the instruction sequence, then read the output from the accumulator.
+  - Aligns naturally with single‑input, single‑output programs. Write the input into the accumulator, run the instruction sequence, then read the output from the accumulator.
 
 ## Novel Design
 
