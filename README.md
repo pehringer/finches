@@ -1,6 +1,6 @@
 # Mapper
 
-Mapper is a library that uses linear genetic programming to automatically synthesize functions that fit input–output data. It’s designed for discovering deterministic mappings from structured data.
+Mapper is a library that uses linear genetic programming to automatically synthesize functions that fit input-output data. It’s designed for discovering deterministic mappings from structured data.
 
 ## Use Cases
 
@@ -10,9 +10,14 @@ Mapper is a library that uses linear genetic programming to automatically synthe
 
 ## Key Concepts
 
-- **Linear Genetic Programming** - A form of genetic programming where programs are represented as linear sequences of instructions. These programs are evolved through mutation and selection to minimize a fitness function.
+- **Linear Genetic Programming** – A form of genetic programming where programs are represented as linear sequences of instructions. These programs are evolved through mutation and selection to minimize a fitness function.
+  + Linear, instruction-based programs map closely to hardware operations, enabling fast evaluation.
+  + Well suited for exploring large, rugged search spaces where traditional methods may struggle.
 
-- **Conditional Execution** - Individual instructions can be conditionally executed based on the results of prior instructions. This enables branching logic without requiring explicit control flow statements like jumps or branches.
+- **Conditional Execution** – Individual instructions can be conditionally executed based on the results of prior instructions. This enables branching logic without requiring explicit control flow statements like jumps or branches.
+  - Traditional branch-based control flow is often brittle and prone to breaking under mutation or crossover. Conditional execution offers a more robust, more position-independent alternative.
+  - Reduces control flow complexity (shrinking the search space) while still supporting basic branching behaviors like piecewise logic through simple if-else structures.
+
 
 - **Accumulator Architecture** - Programs use a single accumulator register for all intermediate computations. This simplifies the instruction set while still allowing for complex operations through sequences of simpler operations.
 
