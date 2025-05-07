@@ -28,58 +28,49 @@ The combination of accumulator-based computation and conditional instruction exe
 
 # Instruction Set Architecture
 
-- **A** - Accumulator register.
-- **F** - Flag register.
-  + **Z** - Zero flag.
-  + **N** - Negative flag.
-- **M[0-255]** - Memory.
-  + Immediate values are preloaded into memory before execution.
+```A``` - Accumulator register.
 
-#### 16-Bit Instructions.
+```F``` - Flag register.
+- ```Z``` - Zero flag, set if the accumulator is zero.
+- ```N``` - Negative flag, set if the accumulator is negative.
 
-|[15-13]  |[12-9]   |[8]    |[7-0]  |
-|---------|---------|-------|-------|
-|CONDITION|OPERATION|SETFLAG|ADDRESS|
+```M[0-255]``` - Memory.
+- Immediate values are preloaded into memory before execution.
 
-#### CONDITION - Condition for execution.
+16-Bit Instructions format.
+|Bits   |Field     |Description                       |
+|-------|----------|----------------------------------|
+|[15-13]|```COND```|Condition for execution.          |
+|[12-9] |```OPER```|Operation to execute.             |
+|[8]    |```SETF```|Set flag register after execution.|
+|[7-0]  |```ADDR```|Address of operand in memory.     |
 
-|CONDITION|Mnemonic|Pseudocode            |Description        |
-|---------|--------|----------------------|-------------------|
-|000      |        |if True               |Always             |
-|001      |LT      |if N                  |Less than.         |
-|010      |LE      |if N or Z             |Less than equal.   |
-|011      |EQ      |if Z                  |Equal.             |
-|100      |NE      |if not Z              |Not equal.         |
-|101      |GE      |if not N              |Greater than equal.|
-|110      |GT      |if not N and not Z    |Greater than.      |
-|111      |NV      |if False              |Never              |
+|```COND```|Mnemonic|Pseudocode                    |
+|----------|--------|------------------------------|
+|000       |        |if True                       |
+|001       |LT      |if ```N```                    |
+|010       |LE      |if ```N``` or ```Z```         |
+|011       |EQ      |if ```Z```                    |
+|100       |NE      |if not ```Z```                |
+|101       |GE      |if not ```N```                |
+|110       |GT      |if not ```N``` and not ```Z```|
+|111       |NV      |if False                      |
 
-#### OPERATION - Operation to execute.
-
-|OPCODE|Mnemonic|Pseudocode            |Description              |
-|------|--------|----------------------|-------------------------|
-|0000  |LD      |A = M[OPERAND]        |Load accumulator.        |
-|0001  |ST      |M[OPERAND] = A        |Store accumulator        |
-|0010  |AD      |A += M[OPERAND]       |Addition.                |
-|0011  |SB      |A -= M[OPERAND]       |Subtraction.             |
-|0100  |ML      |A *= M[OPERAND]       |Multiplication.          |
-|0101  |DV      |A /= M[OPERAND]       |Protected division.      |
-|0110  |MX      |A = max(A, M[OPERAND])|Maximum.                 |
-|0111  |MN      |A = min(A, M[OPERAND])|Minimum.                 |
-|1000  |AB      |A = abs(M[OPERAND])   |Absolute value.          |
-|1001  |PW      |A = pow(M[OPERAND])   |Protected exponentiation.|
-|1010  |SQ      |A = sqrt(M[OPERAND])  |Protected square root.   |
-|1011  |EX      |A = exp(M[OPERAND])   |Protected exponential.   |
-|1100  |LG      |A = log(M[OPERAND])   |Protected logarithm.     |
-|1101  |SN      |A = sin(M[OPERAND])   |Sine.                    |
-|1110  |CS      |A = cos(M[OPERAND])   |Consine.                 |
-|1111  |TN      |A = tan(M[OPERAND])   |Protected tangent.       |
-
-#### SETFLAG - Set flag register after execution.
-
-|SETFLAG|Mnemonic|Pseudocode            |Description|
-|-------|--------|----------------------|-----------|
-|0      |        |F = F                 |Do not set.|
-|1      |S       |Z = A == 0; N = A < 0 |Set flags. |
-
-#### ADDRESS: Address of operand.
+|```OPER```|Mnemonic|Pseudocode                           |Protection|
+|----------|--------|-------------------------------------|----------|
+|0000      |LD      |```A``` = ```M[ADDR]```              |          |
+|0001      |ST      |```M[ADDR]``` = ```A```              |          |
+|0010      |AD      |```A``` += ```M[ADDR]```             |          |
+|0011      |SB      |```A``` -= ```M[ADDR]```             |          |
+|0100      |ML      |```A``` *= ```M[ADDR]```             |          |
+|0101      |DV      |```A``` /= ```M[ADDR]```             |Zero      |
+|0110      |MX      |```A``` = max(```A```, ```M[ADDR]```)|          |
+|0111      |MN      |```A``` = min(```A```, ```M[ADDR]```)|          |
+|1000      |AB      |```A``` = abs(```M[ADDR]```)         |          |
+|1001      |PW      |```A``` = pow(```A```, ```M[ADDR]```)|NaN, Inf  |
+|1010      |SQ      |```A``` = sqrt(```M[ADDR]```)        |NaN, Inf  |
+|1011      |EX      |```A``` = exp(```M[ADDR]```)         |NaN, Inf  |
+|1100      |LG      |```A``` = log(```M[ADDR]```)         |NaN, Inf  |
+|1101      |SN      |```A``` = sin(```M[ADDR]```)         |          |
+|1110      |CS      |```A``` = cos(```M[ADDR]```)         |          |
+|1111      |TN      |```A``` = tan(```M[ADDR]```)         |NaN, Inf  |
