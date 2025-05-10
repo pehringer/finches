@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pehringer/fungen/internal/vm"
+	"github.com/pehringer/mapper/internal/vm"
+	"github.com/pehringer/mapper/internal/types"
 )
 
 func parseInstruction(instruction uint16) string {
@@ -71,13 +72,13 @@ func parseInstruction(instruction uint16) string {
 	return result
 }
 
-func WriteMemoryInstructions(filepath string, memory []float64, instructions []uint16) error {
+func WriteProgram(filepath string, program types.Program) error {
 	assembly := ""
-		for i := range memory {
-		assembly += fmt.Sprintf("%02d %f\n", i, memory[i])
+		for i := range program.Data {
+		assembly += fmt.Sprintf("%02d %f\n", i, program.Data[i])
 	}
-	for i := range instructions {
-		assembly += parseInstruction(instructions[i])
+	for i := range program.Instructions {
+		assembly += parseInstruction(program.Instructions[i])
 	}
 	err := os.WriteFile(filepath, []byte(assembly), 0644)
 	if err != nil {

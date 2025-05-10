@@ -1,38 +1,39 @@
 import random
+import numpy as np
 
-def unflattenable(x, y, z):
-    if x > 0:
-        if y > 0:
-            if z > 0:
-                return x * y * z
-            else:
-                return x + y - z
-        else:
-            if x + y < 0:
-                return (x - y) * z
-            else:
-                return (x + z) ** 2
+def ackley1d(x):
+	"""Ackley function (1D): f(x) = -20*exp(-0.2*|x|) - exp(cos(2*pi*x)) + 20 + e."""
+	return -20 * np.exp(-0.2 * np.abs(x)) - np.exp(np.cos(2 * np.pi * x)) + 20 + np.e
+
+def rastrigin1d(x):
+	"""Rastrigin function (1D): f(x) = x^2 - 10*cos(2*pi*x) + 10."""
+	return x**2 - 10 * np.cos(2 * np.pi * x) + 10
+
+def piecewise_complex(x):
+    """
+    A more complex piecewise function demonstrating varied behaviors:
+
+    f(x) =
+      sin(x)                  if x < -2
+      x^3 + x                 if -2 <= x < 0
+      2*x + 1                 if 0 <= x < 2
+      x * log(x)              if 2 <= x < 5
+      exp(-x) + sin(x)        if x >= 5
+    """
+    if x < -2:
+        return np.sin(x)
+    elif x < 0:
+        return x**3 + x
+    elif x < 2:
+        return 2 * x + 1
+    elif x < 5:
+        return x * np.log(x)
     else:
-        if z > 5:
-            if y < -5:
-                return abs(x - y) + z
-            else:
-                return (z - x) / (abs(y) + 1)
-        else:
-            if x * y < z:
-                return (x + y + z) ** 2
-            else:
-                return x - y + z
+        return np.exp(-x) + np.sin(x)
 
-
-with open("unflattenable.csv", "w") as f:
-	f.write("input0,input1,input2,expected\n")
-	for i in range(0, 100):
-		input0 = random.uniform(-10, 10)
-		input1 = random.uniform(-10, 10)
-		input2 = random.uniform(-10, 10)
-		expected = unflattenable(input0, input1, input2)
-		f.write(f"{round(input0, 4)},{round(input1, 4)},{round(input2, 4)},{round(expected, 4)}\n")
-
-
-
+with open("ackley1d.csv", "w") as f:
+	f.write("input,output\n")
+	for i in range(0, 256):
+		input = random.uniform(-10, 10)
+		output = ackley1d(input)
+		f.write(f"{round(input, 8)},{round(output, 8)}\n")

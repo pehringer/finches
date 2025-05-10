@@ -1,50 +1,45 @@
 package ga
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
-	"github.com/pehringer/fungen/internal/vm"
+	"github.com/pehringer/mapper/internal/io"
+	"github.com/pehringer/mapper/internal/vm"
+	"github.com/pehringer/mapper/internal/types"
 )
 
 type (
-	Program struct {
-		fitness      float64
-		memory       []float64
-		instructions []uint16
+	individual struct {
+		fitness float64
+		types.Program
 	}
 )
 
-func initialization(memory, instructions, programs int) []Program {
-	population := make([]Program, programs)
+func initialization(data, instructions, individuals int) []individual {
+	population := make([]individual, individuals)
 	for i := range population {
 		population[i].fitness = math.MaxFloat64
-		population[i].memory = make([]float64, memory)
-		population[i].instructions = make([]uint16, instructions)
+		population[i].Program = types.EmptyProgram(data, instructions)
 	}
 	return population
 }
 
-func selection(neighborhood int, population []Program) (*Program, *Program) {
+func selection(neighborhood int, population []individual) (*individual, *individual) {
 	i := rand.Intn(len(population))
 	j := (i + rand.Intn(neighborhood) + 1) % len(population)
 	return &population[i], &population[j]
 }
 
-func evaluation(inputs, outputs []float64, candidate *Program) {
+func evaluation(mappings []types.Mapping, candidate *individual) {
 	candidate.fitness = 0
-	m := vm.Machine{}
-	for i := range inputs {
-		m.Set(inputs[i], candidate.memory)
-		for j := range candidate.instructions {
-			m.Execute(candidate.instructions[j])
-		}
-		candidate.fitness += math.Abs(m.Get() - outputs[i])
+	simulation := vm.State{}
+	for i := range mappings {
+		output := simulation.Run(mappings[i].Input, candidate.Program)
+		candidate.fitness += math.Abs(output - mappings[i].Output)
 	}
 }
 
-func dualStrategy(inputs, outputs []float64, population []Program) {
-	parent1, parent2 := selection(10, population)
+func replacement(mappings []types.Mapping, parent1, parent2 *individual) {
 	offspring := parent1
 	if parent1.fitness < parent2.fitness {
 		offspring = parent2
@@ -65,31 +60,34 @@ func dualStrategy(inputs, outputs []float64, population []Program) {
 	case percent < 1.00:
 		mutationQuantization(10.0, offspring)
 	}
-	evaluation(inputs, outputs, offspring)
+	evaluation(mappings, offspring)
 }
 
-func Evolution(inputs, outputs []float64, target float64, memory, instructions, programs int) ([]float64, []uint16) {
-	population := initialization(memory, instructions, programs)
+func termination(mappings []types.Mapping, accuracy float64) float64 {
+	target := 0.0
+	for i := range mappings {
+		target += mappings[i].AbsoluteOutput()
+	}
+	return target - target * accuracy
+}
+
+func Evolution(mappings []types.Mapping, accuracy float64, data, instructions, individuals int) types.Program {
+	target := termination(mappings, accuracy)
+	population := initialization(data, instructions, individuals)
 	solution := &population[0]
 	for solution.fitness > target {
 		for range len(population) {
-			dualStrategy(inputs, outputs, population)
+			parent1, parent2 := selection(10, population)
+			replacement(mappings, parent1, parent2)
 		}
 		for i := range population {
 			if population[i].fitness < solution.fitness {
 				solution = &population[i]
-				fmt.Println("solution error:", solution.fitness)
 			}
 		}
+		io.PrintProgress(target / solution.fitness)
 	}
-	m := vm.Machine{}
-	for i := range inputs {
-		m.Set(inputs[i], solution.memory)
-		for j := range solution.instructions {
-			m.Execute(solution.instructions[j])
-		}
-		fmt.Println("answer:", m.Get())
-	}
-	return solution.memory, solution.instructions
+	io.PrintComplete()
+	return solution.Program
 }
 

@@ -1,3 +1,3 @@
-module github.com/pehringer/fungen
+module github.com/pehringer/mapper
 
 go 1.24.1
