@@ -86,12 +86,7 @@ func (s *State) execute(instruction uint16) {
 	case OperationTN:
 		s.data[result] = guardEdge(math.Tan(s.data[first]))
 	case OperationAB:
-		//s.data[result] = guardEdge(math.Abs(s.data[first]))
-		if 1 << first & s.flag != 0 && 1 << second & s.flag != 0 {
-			s.flag |= 1 << result
-		} else {
-			s.flag &^= 1 << result
-		}
+		s.data[result] = guardEdge(math.Abs(s.data[first]))
 	case OperationLT:
 		if s.data[first] < s.data[second] {
 			s.flag |= 1 << result
@@ -121,6 +116,7 @@ func (s *State) execute(instruction uint16) {
 }
 
 func (s *State) Run(input float64, program types.Program) float64 {
+	copy(s.data[:], program.Data)
 	s.data[0] = input
 	s.flag = 255
 	for i := range program.Instructions {

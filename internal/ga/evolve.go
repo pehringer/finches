@@ -29,7 +29,7 @@ func Evolve(mappings []types.Mapping, accuracy float64, instructions, individual
 	population := initialize(8, instructions, individuals)
 	io.PrintStarting()
 	wg := sync.WaitGroup{}
-	for i := range (8388608 * 4) {
+	for i := range (4194304 * 2) {
 		parent1, parent2 := selectNeighbors(4, population)
 		wg.Add(1)
 		parent1.mu.Lock()
@@ -42,41 +42,28 @@ func Evolve(mappings []types.Mapping, accuracy float64, instructions, individual
 			crossoverSinglePoint(parent1, parent2, offspring)
 			percent := rand.Float32()
 			switch {
-			case percent < 0.30:
+			case percent < 0.20:
 				mutateBitFlips(1, offspring)
-			case percent < 0.50:
-				mutatePerturbation(-0.025, +0.025, offspring)
-			case percent < 0.70:
+			case percent < 0.40:
+				mutatePerturbation(-0.001, +0.001, offspring)
+			case percent < 0.55:
 				mutateScramble(1, offspring)
+			case percent < 0.70:
+				mutateSwap(1, offspring)
 			case percent < 0.80:
-				mutateBitFlips(4, offspring)
+				mutateBitFlips(3, offspring)
 			case percent < 0.90:
 				mutatePerturbation(-0.1, +0.1, offspring)
 			case percent < 1.00:
-				mutateScramble(4, offspring)
+				mutateScramble(3, offspring)
 			}
-			batch := []types.Mapping{
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
-				mappings[rand.Intn(len(mappings))],
+			batch := make([]types.Mapping, 8)
+			for i := range len(batch) {
+				batch[i] = mappings[rand.Intn(len(mappings))]
 			}
 			evaluateFitness(batch, offspring)
-			//evaluateFitness(mappings, offspring)
 		}(parent1, parent2)
-		io.PrintProgress(float64(i) / (8388608 * 4))
+		io.PrintProgress(float64(i) / (4194304 * 2))
 	}
 	wg.Wait()
 	io.PrintComplete()

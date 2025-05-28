@@ -11,6 +11,11 @@ func mutateBitFlips(bits int, offspring *individual) {
 	}
 }
 
+func mutatePerturbation(min, max float64, offspring *individual) {
+	i := rand.Intn(len(offspring.Data))
+	offspring.Data[i] += rand.Float64() * (max - min) + min
+}
+
 func mutateScramble(words int, offspring *individual) {
 	for i := 0; i < words; i++ {
 		j := rand.Intn(len(offspring.Instructions))
@@ -18,20 +23,10 @@ func mutateScramble(words int, offspring *individual) {
 	}
 }
 
-func mutatePerturbation(min, max float64, offspring *individual) {
-	i := rand.Intn(len(offspring.Data))
-	offspring.Data[i] += rand.Float64() * (max - min) + min
-}
 
-func mutateQuantization(scale float64, offspring *individual) {
-	i := rand.Intn(len(offspring.Data))
-	scaled := int64(offspring.Data[i] * scale)
-	offspring.Data[i] = float64(scaled) / scale
-}
-
-func mutateSwap(offspring *individual) {
+func mutateSwap(locations int, offspring *individual) {
 	i := rand.Intn(len(offspring.Instructions))
-	j := rand.Intn(len(offspring.Instructions))
+	j := (i + 1) % len(offspring.Instructions)
 	temporary := offspring.Instructions[i]
 	offspring.Instructions[i] = offspring.Instructions[j]
 	offspring.Instructions[j] = temporary
