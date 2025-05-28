@@ -11,6 +11,13 @@ func mutateBitFlips(bits int, offspring *individual) {
 	}
 }
 
+func mutateScramble(words int, offspring *individual) {
+	for i := 0; i < words; i++ {
+		j := rand.Intn(len(offspring.Instructions))
+		offspring.Instructions[j] ^= uint16(rand.Int())
+	}
+}
+
 func mutatePerturbation(min, max float64, offspring *individual) {
 	i := rand.Intn(len(offspring.Data))
 	offspring.Data[i] += rand.Float64() * (max - min) + min

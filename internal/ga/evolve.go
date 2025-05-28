@@ -2,6 +2,7 @@ package ga
 
 import (
 	"fmt"
+	"sync"
 	"math/rand"
 	"github.com/pehringer/mapper/internal/io"
 	"github.com/pehringer/mapper/internal/vm"
@@ -10,6 +11,7 @@ import (
 
 type (
 	individual struct {
+		mu sync.Mutex
 		fitness float64
 		types.Program
 	}
@@ -23,41 +25,70 @@ func termination(mappings []types.Mapping, accuracy float64) float64 {
 	return target - target * accuracy
 }
 
-func Evolve(mappings []types.Mapping, accuracy float64, data, instructions, individuals int) types.Program {
-	target := termination(mappings, accuracy)
-	population := initialize(data, instructions, individuals)
-	solution := &population[0]
+func Evolve(mappings []types.Mapping, accuracy float64, instructions, individuals int) types.Program {
+	population := initialize(8, instructions, individuals)
 	io.PrintStarting()
-	for solution.fitness > target {
-		for range len(population) {
-			parent1, parent2 := selectNeighbors(10, population)
+	wg := sync.WaitGroup{}
+	for i := range (8388608 * 4) {
+		parent1, parent2 := selectNeighbors(4, population)
+		wg.Add(1)
+		parent1.mu.Lock()
+		parent2.mu.Lock()
+		go func(parent1, parent2 *individual) {
+			defer parent1.mu.Unlock()
+			defer parent2.mu.Unlock()
+			defer wg.Done()
 			offspring := replaceDuel(parent1, parent2)
 			crossoverSinglePoint(parent1, parent2, offspring)
 			percent := rand.Float32()
 			switch {
-			case percent < 0.35:
+			case percent < 0.30:
 				mutateBitFlips(1, offspring)
+			case percent < 0.50:
+				mutatePerturbation(-0.025, +0.025, offspring)
 			case percent < 0.70:
-				mutatePerturbation(-0.001, +0.001, offspring)
+				mutateScramble(1, offspring)
 			case percent < 0.80:
-				mutateBitFlips(3, offspring)
+				mutateBitFlips(4, offspring)
 			case percent < 0.90:
 				mutatePerturbation(-0.1, +0.1, offspring)
-			case percent < 0.99:
-				mutateSwap(offspring)
 			case percent < 1.00:
-				mutateQuantization(10.0, offspring)
+				mutateScramble(4, offspring)
 			}
-			evaluateFitness(mappings, offspring)
-		}
-		for i := range population {
-			if population[i].fitness < solution.fitness {
-				solution = &population[i]
+			batch := []types.Mapping{
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
+				mappings[rand.Intn(len(mappings))],
 			}
-		}
-		io.PrintProgress(target / solution.fitness)
+			evaluateFitness(batch, offspring)
+			//evaluateFitness(mappings, offspring)
+		}(parent1, parent2)
+		io.PrintProgress(float64(i) / (8388608 * 4))
 	}
+	wg.Wait()
 	io.PrintComplete()
+	target := termination(mappings, accuracy)
+	solution := &population[0]
+	for i := range population {
+		evaluateFitness(mappings, &population[i])
+		if population[i].fitness < solution.fitness {
+			solution = &population[i]
+		}
+	}
+	fmt.Println(target, "/", solution.fitness)
 	simulation := vm.State{}
 	fmt.Println(mappings[0].Input, "->", simulation.Run(mappings[0].Input, solution.Program))
 	fmt.Println(mappings[1].Input, "->", simulation.Run(mappings[1].Input, solution.Program))

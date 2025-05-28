@@ -8,48 +8,35 @@ import (
 
 type (
 	State struct {
+		data [8]float64
 		flag byte
-		accumulator float64
-		memory []float64
 	}
 )
 
 const (
-	flagNone = 0x0
-	flagZ    = 0x1
-	flagN    = 0x2
+	OperationMask = 0xF000
+	OperationAD   = 0x0000
+	OperationSB   = 0x1000
+	OperationML   = 0x2000
+	OperationDV   = 0x3000
+	OperationPW   = 0x4000
+	OperationSQ   = 0x5000
+	OperationEX   = 0x6000
+	OperationLG   = 0x7000
+	OperationSN   = 0x8000
+	OperationCS   = 0x9000
+	OperationTN   = 0xA000
+	OperationAB   = 0xB000
+	OperationLT   = 0xC000
+	OperationLE   = 0xD000
+	OperationEQ   = 0xE000
+	OperationNE   = 0xF000
 
-	Condition   = 0xE000
-	ConditionLT = 0x2000
-	ConditionLE = 0x4000
-	ConditionEQ = 0x6000
-	ConditionNE = 0x8000
-	ConditionGE = 0xA000
-	ConditionGT = 0xC000
-	ConditionNV = 0xE000
-
-	Operation   = 0x1E00
-	OperationLD = 0x0000
-	OperationST = 0x0200
-	OperationAD = 0x0400
-	OperationSB = 0x0600
-	OperationML = 0x0800
-	OperationDV = 0x0A00
-	OperationMX = 0x0C00
-	OperationMN = 0x0E00
-	OperationAB = 0x1000
-	OperationPW = 0x1200
-	OperationSQ = 0x1400
-	OperationEX = 0x1600
-	OperationLG = 0x1800
-	OperationSN = 0x1A00
-	OperationCS = 0x1C00
-	OperationTN = 0x1E00
-
-	SetFlag  = 0x0100
-	SetFlagS = 0x0100
-
-	Address = 0x00FF
+	ResultShift    = 9
+	FirstShift     = 6
+	SecondShift    = 3
+	PredicateShift = 0
+	ShiftMask      = 0x0007
 )
 
 func guardZero(value float64) float64 {
@@ -67,101 +54,77 @@ func guardEdge(value float64) float64 {
 }
 
 func (s *State) execute(instruction uint16) {
-	condition := instruction & Condition
-	switch {
-	case condition == ConditionLT && s.flag != flagN:
-		return
-	case condition == ConditionLE && s.flag == flagNone:
-		return
-	case condition == ConditionEQ && s.flag != flagZ:
-		return
-	case condition == ConditionNE && s.flag == flagZ:
-		return
-	case condition == ConditionGE && s.flag == flagN:
-		return
-	case condition == ConditionGT && s.flag != flagNone:
-		return
-	case condition == ConditionNV:
+	predicate := int(instruction >> PredicateShift & ShiftMask)
+	if 1 << predicate & s.flag == 0 {
 		return
 	}
-	operation := instruction & Operation
+	second := int(instruction >> SecondShift & ShiftMask)
+	first := int(instruction >> FirstShift & ShiftMask)
+	result := int(instruction >> ResultShift & ShiftMask)
+	operation := instruction & OperationMask
 	switch operation {
-	case OperationLD:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator = s.memory[address]
-	case OperationST:
-		address := int(instruction & Address) % len(s.memory)
-		s.memory[address] = s.accumulator
 	case OperationAD:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator += s.memory[address]
+		s.data[result] = guardEdge(s.data[first] + s.data[second])
 	case OperationSB:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator -= s.memory[address]
+		s.data[result] = guardEdge(s.data[first] - s.data[second])
 	case OperationML:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator *= s.memory[address]
+		s.data[result] = guardEdge(s.data[first] * s.data[second])
 	case OperationDV:
-		address := int(instruction & Address) % len(s.memory)
-		operand := s.memory[address]
-		s.accumulator /= guardZero(operand)
-	case OperationMX:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator = math.Max(s.accumulator, s.memory[address])
-	case OperationMN:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator = math.Min(s.accumulator, s.memory[address])
-	case OperationAB:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator = math.Abs(s.memory[address])
+		s.data[result] = guardEdge(s.data[first] / guardZero(s.data[second]))
 	case OperationPW:
-		address := int(instruction & Address) % len(s.memory)
-		result := math.Pow(s.accumulator, s.memory[address])
-		s.accumulator = guardEdge(result)
+		s.data[result] = guardEdge(math.Pow(s.data[first], s.data[second]))
 	case OperationSQ:
-		address := int(instruction & Address) % len(s.memory)
-		result := math.Sqrt(s.memory[address])
-		s.accumulator = guardEdge(result)
+		s.data[result] = guardEdge(math.Sqrt(s.data[first]))
 	case OperationEX:
-		address := int(instruction & Address) % len(s.memory)
-		result := math.Exp(s.memory[address])
-		s.accumulator = guardEdge(result)
+		s.data[result] = guardEdge(math.Exp(s.data[first]))
 	case OperationLG:
-		address := int(instruction & Address) % len(s.memory)
-		result := math.Log(s.memory[address])
-		s.accumulator = guardEdge(result)
+		s.data[result] = guardEdge(math.Log(s.data[first]))
 	case OperationSN:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator = math.Sin(s.memory[address])
+		s.data[result] = guardEdge(math.Sin(s.data[first]))
 	case OperationCS:
-		address := int(instruction & Address) % len(s.memory)
-		s.accumulator = math.Cos(s.memory[address])
+		s.data[result] = guardEdge(math.Cos(s.data[first]))
 	case OperationTN:
-		address := int(instruction & Address) % len(s.memory)
-		result := math.Tan(s.memory[address])
-		s.accumulator = guardEdge(result)
-	}
-	setFlag := instruction & SetFlag
-	switch {
-	case setFlag == SetFlagS && s.accumulator < 0:
-		s.flag = flagN
-	case setFlag == SetFlagS && s.accumulator == 0:
-		s.flag = flagZ
-	case setFlag == SetFlagS && s.accumulator > 0:
-		s.flag = flagNone
+		s.data[result] = guardEdge(math.Tan(s.data[first]))
+	case OperationAB:
+		//s.data[result] = guardEdge(math.Abs(s.data[first]))
+		if 1 << first & s.flag != 0 && 1 << second & s.flag != 0 {
+			s.flag |= 1 << result
+		} else {
+			s.flag &^= 1 << result
+		}
+	case OperationLT:
+		if s.data[first] < s.data[second] {
+			s.flag |= 1 << result
+		} else {
+			s.flag &^= 1 << result
+		}
+	case OperationLE:
+		if s.data[first] <= s.data[second] {
+			s.flag |= 1 << result
+		} else {
+			s.flag &^= 1 << result
+		}
+	case OperationEQ:
+		if s.data[first] == s.data[second] {
+			s.flag |= 1 << result
+		} else {
+			s.flag &^= 1 << result
+		}
+	case OperationNE:
+		if s.data[first] != s.data[second] {
+			s.flag |= 1 << result
+		} else {
+			s.flag &^= 1 << result
+		}
 	}
 	return
 }
 
 func (s *State) Run(input float64, program types.Program) float64 {
-	s.flag = flagNone
-	s.accumulator = input
-	if len(s.memory) != len(program.Data) {
-		s.memory = make([]float64, len(program.Data))
-	}
-	copy(s.memory, program.Data)
+	s.data[0] = input
+	s.flag = 255
 	for i := range program.Instructions {
 		s.execute(program.Instructions[i])
 	}
-	return s.accumulator
+	return s.data[0]
 }

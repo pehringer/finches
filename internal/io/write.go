@@ -9,67 +9,48 @@ import (
 )
 
 func parseInstruction(instruction uint16) string {
-	result := ""
-	condition := instruction & vm.Condition
-	switch condition {
-	case vm.ConditionLT:
-		result += "LT"
-	case vm.ConditionLE:
-		result += "LE"
-	case vm.ConditionEQ:
-		result += "EQ"
-	case vm.ConditionNE:
-		result += "NE"
-	case vm.ConditionGE:
-		result += "GE"
-	case vm.ConditionGT:
-		result += "GT"
-	case vm.ConditionNV:
-		result += "NV"
-	}
-	operation := instruction & vm.Operation
+	predicate := int(instruction >> vm.PredicateShift & vm.ShiftMask)
+	line := fmt.Sprintf("%02d ", predicate)
+	operation := instruction & vm.OperationMask
 	switch operation {
-	case vm.OperationLD:
-		result += "LD"
-	case vm.OperationST:
-		result += "ST"
 	case vm.OperationAD:
-		result += "AD"
+		line += "AD "
 	case vm.OperationSB:
-		result += "SB"
+		line += "SB "
 	case vm.OperationML:
-		result += "ML"
+		line += "ML "
 	case vm.OperationDV:
-		result += "DV"
-	case vm.OperationMX:
-		result += "MX"
-	case vm.OperationMN:
-		result += "MN"
-	case vm.OperationAB:
-		result += "AB"
+		line += "DV "
 	case vm.OperationPW:
-		result += "PW"
+		line += "PW "
 	case vm.OperationSQ:
-		result += "SQ"
+		line += "SQ "
 	case vm.OperationEX:
-		result += "EX"
+		line += "EX "
 	case vm.OperationLG:
-		result += "LG"
+		line += "LG "
 	case vm.OperationSN:
-		result += "SN"
+		line += "SN "
 	case vm.OperationCS:
-		result += "CS"
+		line += "CS "
 	case vm.OperationTN:
-		result += "TN"
+		line += "TN "
+	case vm.OperationAB:
+		line += "AB "
+	case vm.OperationLT:
+		line += "LT "
+	case vm.OperationLE:
+		line += "LE "
+	case vm.OperationEQ:
+		line += "EQ "
+	case vm.OperationNE:
+		line += "NE "
 	}
-	setFlag := instruction & vm.SetFlag
-	switch setFlag {
-	case vm.SetFlagS:
-        	result += "S"
-	}
-	address := instruction & vm.Address
-	result += fmt.Sprintf(" %02d\n", address)
-	return result
+	second := int(instruction >> vm.SecondShift & vm.ShiftMask)
+	first := int(instruction >> vm.FirstShift & vm.ShiftMask)
+	result := int(instruction >> vm.ResultShift & vm.ShiftMask)
+	line += fmt.Sprintf("%02d %02d %02d\n", result, first, second)
+	return line
 }
 
 func WriteProgram(filepath string, program types.Program) error {

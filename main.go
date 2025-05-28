@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	program := ga.Evolve(mappings, accuracy, 8, 32, 10000)
+	program := ga.Evolve(mappings, accuracy, 48, 8192 * 2)
 	err = io.WriteProgram(outputPath, program)
 	if err != nil {
 		panic(err)
