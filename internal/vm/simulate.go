@@ -7,36 +7,32 @@ import (
 )
 
 type (
-	State struct {
-		data [8]float64
-		flag byte
-	}
+	State [16]float64
 )
 
 const (
-	OperationMask = 0xF000
-	OperationAD   = 0x0000
-	OperationSB   = 0x1000
-	OperationML   = 0x2000
-	OperationDV   = 0x3000
-	OperationPW   = 0x4000
-	OperationSQ   = 0x5000
-	OperationEX   = 0x6000
-	OperationLG   = 0x7000
-	OperationSN   = 0x8000
-	OperationCS   = 0x9000
-	OperationTN   = 0xA000
-	OperationAB   = 0xB000
-	OperationLT   = 0xC000
-	OperationLE   = 0xD000
-	OperationEQ   = 0xE000
-	OperationNE   = 0xF000
+	OpcodeMask = 0xF000
+	OpcodeAD   = 0x0000
+	OpcodeSB   = 0x1000
+	OpcodeML   = 0x2000
+	OpcodeDV   = 0x3000
+	OpcodePW   = 0x4000
+	OpcodeSQ   = 0x5000
+	OpcodeEX   = 0x6000
+	OpcodeLG   = 0x7000
+	OpcodeSN   = 0x8000
+	OpcodeCS   = 0x9000
+	OpcodeMN   = 0xA000
+	OpcodeMX   = 0xB000
+	OpcodeLT   = 0xC000
+	OpcodeGT   = 0xD000
+	OpcodeN0   = 0xE000
+	OpcodeN1   = 0xF000
 
-	ResultShift    = 9
-	FirstShift     = 6
-	SecondShift    = 3
-	PredicateShift = 0
-	ShiftMask      = 0x0007
+	ResultShift = 8
+	FirstShift  = 4
+	SecondShift = 0
+	ShiftMask   = 0x000F
 )
 
 func guardZero(value float64) float64 {
@@ -54,73 +50,58 @@ func guardEdge(value float64) float64 {
 }
 
 func (s *State) execute(instruction uint16) {
-	predicate := int(instruction >> PredicateShift & ShiftMask)
-	if 1 << predicate & s.flag == 0 {
-		return
-	}
 	second := int(instruction >> SecondShift & ShiftMask)
 	first := int(instruction >> FirstShift & ShiftMask)
 	result := int(instruction >> ResultShift & ShiftMask)
-	operation := instruction & OperationMask
-	switch operation {
-	case OperationAD:
-		s.data[result] = guardEdge(s.data[first] + s.data[second])
-	case OperationSB:
-		s.data[result] = guardEdge(s.data[first] - s.data[second])
-	case OperationML:
-		s.data[result] = guardEdge(s.data[first] * s.data[second])
-	case OperationDV:
-		s.data[result] = guardEdge(s.data[first] / guardZero(s.data[second]))
-	case OperationPW:
-		s.data[result] = guardEdge(math.Pow(s.data[first], s.data[second]))
-	case OperationSQ:
-		s.data[result] = guardEdge(math.Sqrt(s.data[first]))
-	case OperationEX:
-		s.data[result] = guardEdge(math.Exp(s.data[first]))
-	case OperationLG:
-		s.data[result] = guardEdge(math.Log(s.data[first]))
-	case OperationSN:
-		s.data[result] = guardEdge(math.Sin(s.data[first]))
-	case OperationCS:
-		s.data[result] = guardEdge(math.Cos(s.data[first]))
-	case OperationTN:
-		s.data[result] = guardEdge(math.Tan(s.data[first]))
-	case OperationAB:
-		s.data[result] = guardEdge(math.Abs(s.data[first]))
-	case OperationLT:
-		if s.data[first] < s.data[second] {
-			s.flag |= 1 << result
+	opcode := instruction & OpcodeMask
+	switch opcode {
+	case OpcodeAD:
+		s[result] = s[first] + s[second]
+	case OpcodeSB:
+		s[result] = s[first] - s[second]
+	case OpcodeML:
+		s[result] = s[first] * s[second]
+	case OpcodeDV:
+		s[result] = s[first] / guardZero(s[second])
+	case OpcodePW:
+		s[result] = guardEdge(math.Pow(s[first], s[second]))
+	case OpcodeSQ:
+		s[result] = guardEdge(math.Sqrt(s[first]))
+	case OpcodeEX:
+		s[result] = guardEdge(math.Exp(s[first]))
+	case OpcodeLG:
+		s[result] = guardEdge(math.Log(s[first]))
+	case OpcodeSN:
+		s[result] = math.Sin(s[first])
+	case OpcodeCS:
+		s[result] = math.Cos(s[first])
+	case OpcodeMN:
+		s[result] = math.Min(s[first], s[second])
+	case OpcodeMX:
+		s[result] = math.Max(s[first], s[second])
+	case OpcodeLT:
+		if s[first] < s[second] {
+			s[result] = 1
 		} else {
-			s.flag &^= 1 << result
+			s[result] = 0
 		}
-	case OperationLE:
-		if s.data[first] <= s.data[second] {
-			s.flag |= 1 << result
+	case OpcodeGT:
+		if s[first] > s[second] {
+			s[result] = 1
 		} else {
-			s.flag &^= 1 << result
+			s[result] = 0
 		}
-	case OperationEQ:
-		if s.data[first] == s.data[second] {
-			s.flag |= 1 << result
-		} else {
-			s.flag &^= 1 << result
-		}
-	case OperationNE:
-		if s.data[first] != s.data[second] {
-			s.flag |= 1 << result
-		} else {
-			s.flag &^= 1 << result
-		}
+	case OpcodeN0:
+	case OpcodeN1:
 	}
 	return
 }
 
 func (s *State) Run(input float64, program types.Program) float64 {
-	copy(s.data[:], program.Data)
-	s.data[0] = input
-	s.flag = 255
+	copy(s[:], program.Data)
+	s[0] = input
 	for i := range program.Instructions {
 		s.execute(program.Instructions[i])
 	}
-	return s.data[0]
+	return s[1]
 }

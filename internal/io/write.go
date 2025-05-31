@@ -9,42 +9,41 @@ import (
 )
 
 func parseInstruction(instruction uint16) string {
-	predicate := int(instruction >> vm.PredicateShift & vm.ShiftMask)
-	line := fmt.Sprintf("%02d ", predicate)
-	operation := instruction & vm.OperationMask
-	switch operation {
-	case vm.OperationAD:
+	line := ""
+	opcode := instruction & vm.OpcodeMask
+	switch opcode {
+	case vm.OpcodeAD:
 		line += "AD "
-	case vm.OperationSB:
+	case vm.OpcodeSB:
 		line += "SB "
-	case vm.OperationML:
+	case vm.OpcodeML:
 		line += "ML "
-	case vm.OperationDV:
+	case vm.OpcodeDV:
 		line += "DV "
-	case vm.OperationPW:
+	case vm.OpcodePW:
 		line += "PW "
-	case vm.OperationSQ:
+	case vm.OpcodeSQ:
 		line += "SQ "
-	case vm.OperationEX:
+	case vm.OpcodeEX:
 		line += "EX "
-	case vm.OperationLG:
+	case vm.OpcodeLG:
 		line += "LG "
-	case vm.OperationSN:
+	case vm.OpcodeSN:
 		line += "SN "
-	case vm.OperationCS:
+	case vm.OpcodeCS:
 		line += "CS "
-	case vm.OperationTN:
-		line += "TN "
-	case vm.OperationAB:
-		line += "AB "
-	case vm.OperationLT:
+	case vm.OpcodeMN:
+		line += "MN "
+	case vm.OpcodeMX:
+		line += "MX "
+	case vm.OpcodeLT:
 		line += "LT "
-	case vm.OperationLE:
-		line += "LE "
-	case vm.OperationEQ:
-		line += "EQ "
-	case vm.OperationNE:
-		line += "NE "
+	case vm.OpcodeGT:
+		line += "GT "
+	case vm.OpcodeN0:
+		line += "N0 "
+	case vm.OpcodeN1:
+		line += "N1 "
 	}
 	second := int(instruction >> vm.SecondShift & vm.ShiftMask)
 	first := int(instruction >> vm.FirstShift & vm.ShiftMask)

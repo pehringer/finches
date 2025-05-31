@@ -26,11 +26,11 @@ func termination(mappings []types.Mapping, accuracy float64) float64 {
 }
 
 func Evolve(mappings []types.Mapping, accuracy float64, instructions, individuals int) types.Program {
-	population := initialize(8, instructions, individuals)
+	population := initialize(16, instructions, individuals)
 	io.PrintStarting()
 	wg := sync.WaitGroup{}
-	for i := range (4194304 * 2) {
-		parent1, parent2 := selectNeighbors(4, population)
+	for i := range (1048576 * 16) {
+		parent1, parent2 := selectNeighbors(8, population)
 		wg.Add(1)
 		parent1.mu.Lock()
 		parent2.mu.Lock()
@@ -46,24 +46,31 @@ func Evolve(mappings []types.Mapping, accuracy float64, instructions, individual
 				mutateBitFlips(1, offspring)
 			case percent < 0.40:
 				mutatePerturbation(-0.001, +0.001, offspring)
-			case percent < 0.55:
-				mutateScramble(1, offspring)
+			case percent < 0.50:
+				mutateBitFlips(16, offspring)
+			case percent < 0.60:
+				mutateSwap(offspring)
 			case percent < 0.70:
-				mutateSwap(1, offspring)
+				mutateBitFlips(1, offspring)
+				mutateBitFlips(1, offspring)
+				mutateBitFlips(1, offspring)
+				mutateBitFlips(1, offspring)
 			case percent < 0.80:
-				mutateBitFlips(3, offspring)
-			case percent < 0.90:
 				mutatePerturbation(-0.1, +0.1, offspring)
+			case percent < 0.90:
+				mutateBitFlips(16, offspring)
+				mutateBitFlips(16, offspring)
+				mutateBitFlips(16, offspring)
+				mutateBitFlips(16, offspring)
 			case percent < 1.00:
-				mutateScramble(3, offspring)
+				mutateSwap(offspring)
+				mutateSwap(offspring)
+				mutateSwap(offspring)
+				mutateSwap(offspring)
 			}
-			batch := make([]types.Mapping, 8)
-			for i := range len(batch) {
-				batch[i] = mappings[rand.Intn(len(mappings))]
-			}
-			evaluateFitness(batch, offspring)
+			evaluateFitness(mappings, offspring)
 		}(parent1, parent2)
-		io.PrintProgress(float64(i) / (4194304 * 2))
+		io.PrintProgress(float64(i) / (1048576 * 16))
 	}
 	wg.Wait()
 	io.PrintComplete()
