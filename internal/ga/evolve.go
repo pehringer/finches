@@ -28,7 +28,7 @@ func termination(mappings []types.Mapping, accuracy float64) float64 {
 func Evolve(mappings []types.Mapping, accuracy float64, instructions, individuals int) types.Program {
 	population := initialize(16, instructions, individuals)
 	io.PrintStarting()
-	for i := range (1024 * 64) {
+	for i := range (1024 * 128) {
 		wg := sync.WaitGroup{}
 		for range (1024 * 4) {
 			parent1, parent2 := selectNeighbors(8, population)
@@ -73,7 +73,7 @@ func Evolve(mappings []types.Mapping, accuracy float64, instructions, individual
 			}(parent1, parent2)
 		}
 		wg.Wait()
-		io.PrintProgress(float64(i) / (1024 * 64))
+		io.PrintProgress(float64(i) / (1024 * 128))
 	}
 	io.PrintComplete()
 	target := termination(mappings, accuracy)
