@@ -41,8 +41,8 @@ func ReadMappings(filename string) ([]types.Mapping, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(values[0]) != 2 {
-		return nil, fmt.Errorf("expected 2 columns but has: %d", len(values[0]))
+	if len(values[0]) < 2 {
+		return nil, fmt.Errorf("expected 2 or more columns")
 	}
 	mappings := make([]types.Mapping, len(values)-1)
 	for i := 1; i < len(values); i++ {
@@ -50,8 +50,9 @@ func ReadMappings(filename string) ([]types.Mapping, error) {
 		if err != nil {
 			return nil, fmt.Errorf("row %d: %w", i+1, err)
 		}
-		mappings[i-1].Input = columns[0]
-		mappings[i-1].Output = columns[1]
+		output := len(columns) - 1
+		mappings[i-1].Inputs = columns[:output]
+		mappings[i-1].Output = columns[output]
 	}
 	return mappings, nil
 }

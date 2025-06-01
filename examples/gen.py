@@ -20,9 +20,15 @@ def piecewise(x):
 	else:
 		return math.tan(0.2 * x)
 
-with open("piecewise.csv", "w") as f:
-	f.write("input,output\n")
+def polynomial(x, y, z):
+	# f(x, y, z) = 2*x*y + 3*z^2 - x + 5
+	return 2 * x * y + 3 * z**2 - x + 5
+
+with open("polynomial.csv", "w") as f:
+	f.write("inputX,inputY,inputZ,output\n")
 	for i in range(0, 1000):
-		input = random.uniform(-5, 5)
-		output = piecewise(input)
-		f.write(f"{round(input, 10)},{round(output, 10)}\n")
+		x = random.uniform(-5, 5)
+		y = random.uniform(-5, 5)
+		z = random.uniform(-5, 5)
+		output = polynomial(x, y, z)
+		f.write(f"{round(x, 10)},{round(y, 10)},{round(z, 10)},{round(output, 10)}\n")

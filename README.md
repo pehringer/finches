@@ -11,7 +11,9 @@ Mapper is a library that uses linear genetic programming to automatically synthe
 # Instruction Set Architecture 
 
 ```R[0-15]``` - Registers.
-- Constant values are preloaded into the registers before program execution.
+- **Input registers**: The 1st input is loaded into R0, the 2nd into R1, and so on.
+- **Output register**: The final program output is stored in R15.
+- **Constant registers**: Remaining registers are pre-loaded with constant values.
 
 - **16 Bit Instruction Format:**
 |OPCODE |RESULT|FIRST|SECOND|
@@ -24,15 +26,15 @@ Mapper is a library that uses linear genetic programming to automatically synthe
 |0001  |SB      |```R[RESULT] = R[FIRST] - R[SECOND]```        |          |
 |0010  |ML      |```R[RESULT] = R[FIRST] * R[SECOND]```        |          |
 |0011  |DV      |```R[RESULT] = R[FIRST] / R[SECOND]```        |Zero      |
-|0100  |PW      |```R[RESULT] = pow(R[FIRST], R[SECOND])```    |NaN, Inf  |
-|0101  |SQ      |```R[RESULT] = sqrt(R[FIRST])```              |NaN, Inf  |
-|0110  |EX      |```R[RESULT] = exp(R[FIRST])```               |NaN, Inf  |
-|0111  |LG      |```R[RESULT] = log(R[FIRST])```               |NaN, Inf  |
-|1000  |SN      |```R[RESULT] = sin(R[FIRST])```               |          |
-|1001  |CS      |```R[RESULT] = cos(R[FIRST])```               |          |
-|1010  |MN      |```R[RESULT] = min(R[FIRST], R[SECOND])```    |          |
-|1011  |MX      |```R[RESULT] = max(R[FIRST], R[SECOND])```    |          |
-|1100  |LT      |```R[RESULT] = R[FIRST] < R[SECOND] ? 1 : 0```|          |
-|1101  |GT      |```R[RESULT] = R[FIRST] > R[SECOND] ? 1 : 0```|          |
-|1110  |N0      |                                              |          |
-|1111  |N1      |                                              |          |
+|0100  |MN      |```R[RESULT] = min(R[FIRST], R[SECOND])```    |          |
+|0101  |MX      |```R[RESULT] = max(R[FIRST], R[SECOND])```    |          |
+|0110  |LT      |```R[RESULT] = R[FIRST] < R[SECOND] ? 1 : 0```|          |
+|0111  |GT      |```R[RESULT] = R[FIRST] > R[SECOND] ? 1 : 0```|          |
+|1000  |PW      |```R[RESULT] = pow(R[FIRST], R[SECOND])```    |NaN, Inf  |
+|1001  |SQ      |```R[RESULT] = sqrt(R[FIRST])```              |NaN, Inf  |
+|1010  |EX      |```R[RESULT] = exp(R[FIRST])```               |NaN, Inf  |
+|1011  |LG      |```R[RESULT] = log(R[FIRST])```               |NaN, Inf  |
+|1100  |SN      |```R[RESULT] = sin(R[FIRST])```               |          |
+|1101  |CS      |```R[RESULT] = cos(R[FIRST])```               |          |
+|1110  |NOP     |                                              |          |
+|1111  |NOP     |                                              |          |

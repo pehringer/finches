@@ -6,7 +6,7 @@ import (
 
 type (
 	Mapping struct {
-		Input  float64
+		Inputs []float64
 		Output float64
 	}
 )

@@ -16,18 +16,16 @@ const (
 	OpcodeSB   = 0x1000
 	OpcodeML   = 0x2000
 	OpcodeDV   = 0x3000
-	OpcodePW   = 0x4000
-	OpcodeSQ   = 0x5000
-	OpcodeEX   = 0x6000
-	OpcodeLG   = 0x7000
-	OpcodeSN   = 0x8000
-	OpcodeCS   = 0x9000
-	OpcodeMN   = 0xA000
-	OpcodeMX   = 0xB000
-	OpcodeLT   = 0xC000
-	OpcodeGT   = 0xD000
-	OpcodeN0   = 0xE000
-	OpcodeN1   = 0xF000
+	OpcodeMN   = 0x4000
+	OpcodeMX   = 0x5000
+	OpcodeLT   = 0x6000
+	OpcodeGT   = 0x7000
+	OpcodePW   = 0x8000
+	OpcodeSQ   = 0x9000
+	OpcodeEX   = 0xA000
+	OpcodeLG   = 0xB000
+	OpcodeSN   = 0xC000
+	OpcodeCS   = 0xD000
 
 	ResultShift = 8
 	FirstShift  = 4
@@ -63,18 +61,6 @@ func (s *State) execute(instruction uint16) {
 		s[result] = s[first] * s[second]
 	case OpcodeDV:
 		s[result] = s[first] / guardZero(s[second])
-	case OpcodePW:
-		s[result] = guardEdge(math.Pow(s[first], s[second]))
-	case OpcodeSQ:
-		s[result] = guardEdge(math.Sqrt(s[first]))
-	case OpcodeEX:
-		s[result] = guardEdge(math.Exp(s[first]))
-	case OpcodeLG:
-		s[result] = guardEdge(math.Log(s[first]))
-	case OpcodeSN:
-		s[result] = math.Sin(s[first])
-	case OpcodeCS:
-		s[result] = math.Cos(s[first])
 	case OpcodeMN:
 		s[result] = math.Min(s[first], s[second])
 	case OpcodeMX:
@@ -91,17 +77,29 @@ func (s *State) execute(instruction uint16) {
 		} else {
 			s[result] = 0
 		}
-	case OpcodeN0:
-	case OpcodeN1:
+	case OpcodePW:
+		s[result] = guardEdge(math.Pow(s[first], s[second]))
+	case OpcodeSQ:
+		s[result] = guardEdge(math.Sqrt(s[first]))
+	case OpcodeEX:
+		s[result] = guardEdge(math.Exp(s[first]))
+	case OpcodeLG:
+		s[result] = guardEdge(math.Log(s[first]))
+	case OpcodeSN:
+		s[result] = math.Sin(s[first])
+	case OpcodeCS:
+		s[result] = math.Cos(s[first])
+	default:
+		return
 	}
 	return
 }
 
-func (s *State) Run(input float64, program types.Program) float64 {
+func (s *State) Run(inputs []float64, program types.Program) float64 {
 	copy(s[:], program.Data)
-	s[0] = input
+	copy(s[:], inputs)
 	for i := range program.Instructions {
 		s.execute(program.Instructions[i])
 	}
-	return s[1]
+	return s[15]
 }
