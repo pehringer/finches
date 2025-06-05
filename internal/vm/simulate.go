@@ -16,16 +16,18 @@ const (
 	OpcodeSB   = 0x1000
 	OpcodeML   = 0x2000
 	OpcodeDV   = 0x3000
-	OpcodeMN   = 0x4000
-	OpcodeMX   = 0x5000
-	OpcodeLT   = 0x6000
-	OpcodeGT   = 0x7000
-	OpcodePW   = 0x8000
-	OpcodeSQ   = 0x9000
-	OpcodeEX   = 0xA000
-	OpcodeLG   = 0xB000
-	OpcodeSN   = 0xC000
-	OpcodeCS   = 0xD000
+	OpcodePW   = 0x4000
+	OpcodeSQ   = 0x5000
+	OpcodeEX   = 0x6000
+	OpcodeLG   = 0x7000
+	OpcodeSN   = 0x8000
+	OpcodeAS   = 0x9000
+	OpcodeCS   = 0xA000
+	OpcodeAC   = 0xB000
+	OpcodeMN   = 0xC000
+	OpcodeMX   = 0xD000
+	OpcodeLT   = 0xE000
+	OpcodeGT   = 0xF000
 
 	ResultShift = 8
 	FirstShift  = 4
@@ -33,18 +35,24 @@ const (
 	ShiftMask   = 0x000F
 )
 
-func guardZero(value float64) float64 {
-	if value == 0 {
+func float(b bool) float64 {
+	if b {
 		return 1
 	}
-	return value
+	return 0
 }
 
-func guardEdge(value float64) float64 {
-	if math.IsNaN(value) || math.IsInf(value, 0) {
-		return 0
+func divide(n, d float64) float64 {
+	if math.Abs(d) < 1e-9 {
+		if math.Abs(n) < 1e-9 {
+			return math.NaN() // zero/0
+		} else if n > 0 {
+			return math.Inf(1) // positive/0
+		} else if n < 0 {
+			return math.Inf(-1) // negative/0
+		}
 	}
-	return value
+	return n / d
 }
 
 func (s *State) execute(instruction uint16) {
@@ -60,37 +68,31 @@ func (s *State) execute(instruction uint16) {
 	case OpcodeML:
 		s[result] = s[first] * s[second]
 	case OpcodeDV:
-		s[result] = s[first] / guardZero(s[second])
+		s[result] = divide(s[first], s[second])
+	case OpcodePW:
+		s[result] = math.Pow(s[first], s[second])
+	case OpcodeSQ:
+		s[result] = math.Sqrt(s[first])
+	case OpcodeEX:
+		s[result] = math.Exp(s[first])
+	case OpcodeLG:
+		s[result] = math.Log(s[first])
+	case OpcodeSN:
+		s[result] = math.Sin(s[first])
+	case OpcodeAS:
+		s[result] = math.Asin(s[first])
+	case OpcodeCS:
+		s[result] = math.Cos(s[first])
+	case OpcodeAC:
+		s[result] = math.Acos(s[first])
 	case OpcodeMN:
 		s[result] = math.Min(s[first], s[second])
 	case OpcodeMX:
 		s[result] = math.Max(s[first], s[second])
 	case OpcodeLT:
-		if s[first] < s[second] {
-			s[result] = 1
-		} else {
-			s[result] = 0
-		}
+		s[result] = float(s[first] < s[second])
 	case OpcodeGT:
-		if s[first] > s[second] {
-			s[result] = 1
-		} else {
-			s[result] = 0
-		}
-	case OpcodePW:
-		s[result] = guardEdge(math.Pow(s[first], s[second]))
-	case OpcodeSQ:
-		s[result] = guardEdge(math.Sqrt(s[first]))
-	case OpcodeEX:
-		s[result] = guardEdge(math.Exp(s[first]))
-	case OpcodeLG:
-		s[result] = guardEdge(math.Log(s[first]))
-	case OpcodeSN:
-		s[result] = math.Sin(s[first])
-	case OpcodeCS:
-		s[result] = math.Cos(s[first])
-	default:
-		return
+		s[result] = float(s[first] > s[second])
 	}
 	return
 }

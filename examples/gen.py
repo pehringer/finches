@@ -24,11 +24,23 @@ def polynomial(x, y, z):
 	# f(x, y, z) = 2*x*y + 3*z^2 - x + 5
 	return 2 * x * y + 3 * z**2 - x + 5
 
-with open("polynomial.csv", "w") as f:
-	f.write("inputX,inputY,inputZ,output\n")
+def nested(x, y):
+	if x < 0:
+		if y > -1:
+			return 0.5 * x + math.sin(y)
+		else:
+			return x**2 - 2 * y
+	else:
+		if y < 1:
+			return math.tan(0.2 * x) - y
+		else:
+			log_arg = abs(x * y) + 1
+			return math.log(log_arg) + 2
+
+with open("nested.csv", "w") as f:
+	f.write("inputX,inputY,output\n")
 	for i in range(0, 1000):
 		x = random.uniform(-5, 5)
 		y = random.uniform(-5, 5)
-		z = random.uniform(-5, 5)
-		output = polynomial(x, y, z)
-		f.write(f"{round(x, 10)},{round(y, 10)},{round(z, 10)},{round(output, 10)}\n")
+		output = nested(x, y)
+		f.write(f"{round(x, 10)},{round(y, 10)},{round(output, 10)}\n")

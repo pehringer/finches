@@ -13,35 +13,37 @@ func parseInstruction(instruction uint16) string {
 	opcode := instruction & vm.OpcodeMask
 	switch opcode {
 	case vm.OpcodeAD:
-		line += "AD  "
+		line += "AD "
 	case vm.OpcodeSB:
-		line += "SB  "
+		line += "SB "
 	case vm.OpcodeML:
-		line += "ML  "
+		line += "ML "
 	case vm.OpcodeDV:
-		line += "DV  "
-	case vm.OpcodeMN:
-		line += "MN  "
-	case vm.OpcodeMX:
-		line += "MX  "
-	case vm.OpcodeLT:
-		line += "LT  "
-	case vm.OpcodeGT:
-		line += "GT  "
+		line += "DV "
 	case vm.OpcodePW:
-		line += "PW  "
+		line += "PW "
 	case vm.OpcodeSQ:
-		line += "SQ  "
+		line += "SQ "
 	case vm.OpcodeEX:
-		line += "EX  "
+		line += "EX "
 	case vm.OpcodeLG:
-		line += "LG  "
+		line += "LG "
 	case vm.OpcodeSN:
-		line += "SN  "
+		line += "SN "
+	case vm.OpcodeAS:
+		line += "AS "
 	case vm.OpcodeCS:
-		line += "CS  "
-	default:
-		line += "NOP "
+		line += "CS "
+	case vm.OpcodeAC:
+		line += "AC "
+	case vm.OpcodeMN:
+		line += "MN "
+	case vm.OpcodeMX:
+		line += "MX "
+	case vm.OpcodeLT:
+		line += "LT "
+	case vm.OpcodeGT:
+		line += "GT "
 	}
 	second := int(instruction >> vm.SecondShift & vm.ShiftMask)
 	first := int(instruction >> vm.FirstShift & vm.ShiftMask)

@@ -17,18 +17,19 @@ type (
 	}
 )
 
-func termination(mappings []types.Mapping, accuracy float64) float64 {
-	target := 0.0
+func termination(mappings []types.Mapping, accuracy float64) (float64, float64) {
+	total := 0.0
 	for i := range mappings {
-		target += mappings[i].AbsoluteOutput()
+		total += mappings[i].AbsoluteOutput()
 	}
-	return target - target * accuracy
+	return total, total - total * accuracy
 }
 
 func Evolve(mappings []types.Mapping, accuracy float64, instructions, individuals int) types.Program {
+	penalty, target := termination(mappings, accuracy)
 	population := initialize(16, instructions, individuals)
 	io.PrintStarting()
-	for i := range (1024 * 128) {
+	for i := range (1024 * 256) {
 		wg := sync.WaitGroup{}
 		for range (1024 * 4) {
 			parent1, parent2 := selectNeighbors(8, population)
@@ -69,17 +70,16 @@ func Evolve(mappings []types.Mapping, accuracy float64, instructions, individual
 					mutateSwap(offspring)
 					mutateSwap(offspring)
 				}
-				evaluateFitness(mappings, offspring)
+				evaluateFitness(mappings, offspring, penalty)
 			}(parent1, parent2)
 		}
 		wg.Wait()
-		io.PrintProgress(float64(i) / (1024 * 128))
+		io.PrintProgress(float64(i) / (1024 * 256))
 	}
 	io.PrintComplete()
-	target := termination(mappings, accuracy)
 	solution := &population[0]
 	for i := range population {
-		evaluateFitness(mappings, &population[i])
+		evaluateFitness(mappings, &population[i], penalty)
 		if population[i].fitness < solution.fitness {
 			solution = &population[i]
 		}
