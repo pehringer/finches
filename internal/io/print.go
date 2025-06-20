@@ -10,26 +10,17 @@ var (
 )
 
 func PrintStarting() {
-	fmt.Print("running...")
+	fmt.Print("0% 0ms")
 	start = time.Now().UnixMilli()
 }
 
 func PrintProgress(fraction float64) {
 	elapsed := time.Now().UnixMilli() - start
 	percent := fraction * 100
-	bars := int(percent / 2)
-	fmt.Print("\r")
-	for i := 0; i < 50; i++ {
-		if i < bars {
-			fmt.Print("|")
-		} else {
-			fmt.Print(" ")
-		}
-	}
 	if percent < 100.0 {
-		fmt.Printf("%.0f%% %dms", percent, elapsed)
+		fmt.Printf("\r%.0f%% %dms", percent, elapsed)
 	} else {
-		fmt.Printf("100%% %dms", elapsed)
+		fmt.Printf("\r100%% %dms", elapsed)
 	}
 }
 

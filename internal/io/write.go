@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/pehringer/mapper/internal/vm"
-	"github.com/pehringer/mapper/internal/types"
 )
 
 func parseInstruction(instruction uint16) string {
@@ -52,15 +51,15 @@ func parseInstruction(instruction uint16) string {
 	return line
 }
 
-func WriteProgram(filepath string, program types.Program) error {
+func WriteSolution(path string, constants []float64, instructions []uint16) error {
 	assembly := ""
-		for i := range program.Data {
-		assembly += fmt.Sprintf("%02d %f\n", i, program.Data[i])
+		for i := range constants {
+		assembly += fmt.Sprintf("%02d %f\n", i, constants[i])
 	}
-	for i := range program.Instructions {
-		assembly += parseInstruction(program.Instructions[i])
+	for i := range instructions {
+		assembly += parseInstruction(instructions[i])
 	}
-	err := os.WriteFile(filepath, []byte(assembly), 0644)
+	err := os.WriteFile(path, []byte(assembly), 0644)
 	if err != nil {
 		return fmt.Errorf("could not write file: %w", err)
 	}

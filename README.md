@@ -40,7 +40,7 @@ These design choices, including the **compact uniform 16-bit instruction format*
 ```R[0-15]``` - Registers.
 - **Input registers**: The 1st input is loaded into R0, the 2nd into R1, and so on.
 - **Output register**: The final program output is stored in R15.
-- **Constant registers**: Remaining registers are pre-loaded with constant values.
+- The remaining registers are pre-loaded with constant values.
 
 - **16 Bit Instruction Format:**
 |OPCODE |RESULT|FIRST|SECOND|

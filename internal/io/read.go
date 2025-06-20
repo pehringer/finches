@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"github.com/pehringer/mapper/internal/types"
 )
 
 func readCSV(filename string) ([][]string, error) {
@@ -36,23 +35,24 @@ func parseFloats(values []string) ([]float64, error) {
 	return result, nil
 }
 
-func ReadMappings(filename string) ([]types.Mapping, error) {
+func ReadMappings(filename string) ([][]float64, []float64, error) {
 	values, err := readCSV(filename)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(values[0]) < 2 {
-		return nil, fmt.Errorf("expected 2 or more columns")
+		return nil, nil, fmt.Errorf("expected 2 or more columns")
 	}
-	mappings := make([]types.Mapping, len(values)-1)
+	inputs := make([][]float64, len(values)-1)
+	outputs := make([]float64, len(values)-1)
 	for i := 1; i < len(values); i++ {
 		columns, err := parseFloats(values[i])
 		if err != nil {
-			return nil, fmt.Errorf("row %d: %w", i+1, err)
+			return nil, nil, fmt.Errorf("row %d: %w", i+1, err)
 		}
 		output := len(columns) - 1
-		mappings[i-1].Inputs = columns[:output]
-		mappings[i-1].Output = columns[output]
+		inputs[i-1] = columns[:output]
+		outputs[i-1] = columns[output]
 	}
-	return mappings, nil
+	return inputs, outputs, nil
 }

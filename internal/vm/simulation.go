@@ -2,12 +2,6 @@ package vm
 
 import (
 	"math"
-
-	"github.com/pehringer/mapper/internal/types"
-)
-
-type (
-	State [16]float64
 )
 
 const (
@@ -55,53 +49,54 @@ func divide(n, d float64) float64 {
 	return n / d
 }
 
-func (s *State) execute(instruction uint16) {
+func execute(registers *[16]float64, instruction uint16) {
 	second := int(instruction >> SecondShift & ShiftMask)
 	first := int(instruction >> FirstShift & ShiftMask)
 	result := int(instruction >> ResultShift & ShiftMask)
 	opcode := instruction & OpcodeMask
 	switch opcode {
 	case OpcodeAD:
-		s[result] = s[first] + s[second]
+		registers[result] = registers[first] + registers[second]
 	case OpcodeSB:
-		s[result] = s[first] - s[second]
+		registers[result] = registers[first] - registers[second]
 	case OpcodeML:
-		s[result] = s[first] * s[second]
+		registers[result] = registers[first] * registers[second]
 	case OpcodeDV:
-		s[result] = divide(s[first], s[second])
+		registers[result] = divide(registers[first], registers[second])
 	case OpcodePW:
-		s[result] = math.Pow(s[first], s[second])
+		registers[result] = math.Pow(registers[first], registers[second])
 	case OpcodeSQ:
-		s[result] = math.Sqrt(s[first])
+		registers[result] = math.Sqrt(registers[first])
 	case OpcodeEX:
-		s[result] = math.Exp(s[first])
+		registers[result] = math.Exp(registers[first])
 	case OpcodeLG:
-		s[result] = math.Log(s[first])
+		registers[result] = math.Log(registers[first])
 	case OpcodeSN:
-		s[result] = math.Sin(s[first])
+		registers[result] = math.Sin(registers[first])
 	case OpcodeAS:
-		s[result] = math.Asin(s[first])
+		registers[result] = math.Asin(registers[first])
 	case OpcodeCS:
-		s[result] = math.Cos(s[first])
+		registers[result] = math.Cos(registers[first])
 	case OpcodeAC:
-		s[result] = math.Acos(s[first])
+		registers[result] = math.Acos(registers[first])
 	case OpcodeMN:
-		s[result] = math.Min(s[first], s[second])
+		registers[result] = math.Min(registers[first], registers[second])
 	case OpcodeMX:
-		s[result] = math.Max(s[first], s[second])
+		registers[result] = math.Max(registers[first], registers[second])
 	case OpcodeLT:
-		s[result] = float(s[first] < s[second])
+		registers[result] = float(registers[first] < registers[second])
 	case OpcodeGT:
-		s[result] = float(s[first] > s[second])
+		registers[result] = float(registers[first] > registers[second])
 	}
 	return
 }
 
-func (s *State) Run(inputs []float64, program types.Program) float64 {
-	copy(s[:], program.Data)
-	copy(s[:], inputs)
-	for i := range program.Instructions {
-		s.execute(program.Instructions[i])
+func Run(inputs, constants []float64, instructions []uint16) float64 {
+	registers := [16]float64{}
+	copy(registers[:], constants)
+	copy(registers[:], inputs)
+	for i := range instructions {
+		execute(&registers, instructions[i])
 	}
-	return s[15]
+	return registers[15]
 }
