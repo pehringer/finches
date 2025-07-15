@@ -38,7 +38,6 @@ def nested(x, y):
 			return math.log(log_arg) + 2
 
 with open("nested.csv", "w") as f:
-	f.write("inputX,inputY,output\n")
 	for i in range(0, 1000):
 		x = random.uniform(-5, 5)
 		y = random.uniform(-5, 5)
