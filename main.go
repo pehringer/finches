@@ -1,16 +1,16 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 	"strconv"
 )
 
 var (
-	optionG int     = 10000
-	optionI string  = "input.csv"
-	optionO string  = "output.py"
-	optionP int     = 1000
+	optionG int    = 10000
+	optionI string = "input.csv"
+	optionO string = "output.py"
+	optionP int    = 1000
 )
 
 func parseGenerations(argument string) {
@@ -40,7 +40,7 @@ func parsePopulation(argument string) {
 }
 
 func main() {
-	if len(os.Args) % 2 != 1 {
+	if len(os.Args)%2 != 1 {
 		fmt.Println("invalid number of arguments:", len(os.Args))
 		os.Exit(-1)
 	}

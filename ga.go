@@ -19,22 +19,22 @@ func initialize(population int, outputs []float64) []individual {
 	for i := range individuals {
 		individuals[i].fitness = math.MaxFloat64
 		individuals[i].constants = []float64{
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
-			rand.Float64() * 200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
+			rand.Float64()*200.0 - 100.0,
 		}
 		individuals[i].instructions = []uint16{
 			uint16(rand.Int()),
@@ -77,7 +77,7 @@ func mutate(offspring *individual) *individual {
 	switch rand.Intn(4) {
 	case 0:
 		i := rand.Intn(len(offspring.constants))
-		offspring.constants[i] += rand.Float64() * 0.002 - 0.001
+		offspring.constants[i] += rand.Float64()*0.002 - 0.001
 	case 1:
 		i := rand.Intn(len(offspring.instructions))
 		offspring.instructions[i] = uint16(rand.Int())
@@ -102,14 +102,14 @@ func mutate(offspring *individual) *individual {
 func transfer(donor, offspring *individual) *individual {
 	if rand.Float64() < 0.01 {
 		n := rand.Intn(min(len(donor.instructions), 10)) + 1
-		i := rand.Intn(len(donor.instructions)+ 1 - n)
-		body := donor.instructions[i:i+n]
+		i := rand.Intn(len(donor.instructions) + 1 - n)
+		body := donor.instructions[i : i+n]
 		j := rand.Intn(len(offspring.instructions) + 1)
 		head := offspring.instructions[:j]
 		tail := offspring.instructions[j:]
 		offspring.instructions = append(head, append(body, tail...)...)
 	}
-        return offspring
+	return offspring
 }
 
 func evaluate(inputs [][]float64, outputs []float64, offspring *individual) {
@@ -128,7 +128,7 @@ func evaluate(inputs [][]float64, outputs []float64, offspring *individual) {
 func terminate(individuals []individual) *individual {
 	alpha := &individuals[0]
 	for i := range individuals {
-		if individuals[i].fitness < alpha.fitness  {
+		if individuals[i].fitness < alpha.fitness {
 			alpha = &individuals[i]
 		}
 	}

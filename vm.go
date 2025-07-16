@@ -5,23 +5,23 @@ import (
 )
 
 const (
-	opcodeMask = 0xF000
-	opcodeAD   = 0x0000
-	opcodeSB   = 0x1000
-	opcodeML   = 0x2000
-	opcodeDV   = 0x3000
-	opcodePW   = 0x4000
-	opcodeSQ   = 0x5000
-	opcodeEX   = 0x6000
-	opcodeLG   = 0x7000
-	opcodeSN   = 0x8000
-	opcodeAS   = 0x9000
-	opcodeCS   = 0xA000
-	opcodeAC   = 0xB000
-	opcodeMN   = 0xC000
-	opcodeMX   = 0xD000
-	opcodeLT   = 0xE000
-	opcodeGT   = 0xF000
+	opcodeMask  = 0xF000
+	opcodeAD    = 0x0000
+	opcodeSB    = 0x1000
+	opcodeML    = 0x2000
+	opcodeDV    = 0x3000
+	opcodePW    = 0x4000
+	opcodeSQ    = 0x5000
+	opcodeEX    = 0x6000
+	opcodeLG    = 0x7000
+	opcodeSN    = 0x8000
+	opcodeAS    = 0x9000
+	opcodeCS    = 0xA000
+	opcodeAC    = 0xB000
+	opcodeMN    = 0xC000
+	opcodeMX    = 0xD000
+	opcodeLT    = 0xE000
+	opcodeGT    = 0xF000
 	resultShift = 8
 	firstShift  = 4
 	secondShift = 0
@@ -87,7 +87,6 @@ func executeInstruction(registers *[16]float64, instruction uint16) {
 	case opcodeGT:
 		registers[result] = castFloat(registers[first] > registers[second])
 	}
-	return
 }
 
 func simulateProgram(inputs, constants []float64, instructions []uint16) float64 {
