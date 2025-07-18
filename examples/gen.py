@@ -9,6 +9,10 @@ def quadratic(x):
 	# f(x) = ax^2 + bx + c
 	return 2*x**2 + 3*x + 4
 
+def polynomial(x, y, z):
+	# f(x, y, z) = 2*x*y + 3*z^2 - x + 5
+	return 2 * x * y + 3 * z**2 - x + 5
+
 def piecewise(x):
 	#        { 0.5x + sin(x) if x < 0
 	# f(x) = { x^2 − 2       if 0 <= x < 1
@@ -19,10 +23,6 @@ def piecewise(x):
 		return x**2 - 2
 	else:
 		return math.tan(0.2 * x)
-
-def polynomial(x, y, z):
-	# f(x, y, z) = 2*x*y + 3*z^2 - x + 5
-	return 2 * x * y + 3 * z**2 - x + 5
 
 def nested(x, y):
 	if x < 0:

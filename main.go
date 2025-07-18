@@ -9,7 +9,7 @@ import (
 var (
 	optionG int    = 10000
 	optionI string = "input.csv"
-	optionO string = "output.py"
+	optionO string = "output.go"
 	optionP int    = 1000
 )
 
@@ -73,7 +73,7 @@ func main() {
 		os.Exit(-1)
 	}
 	constants, instructions := evolve(optionG, optionP, inputs, outputs)
-	err = writeProgram(optionO, constants, instructions)
+	err = writeProgram(optionO, len(inputs[0]), constants, instructions)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)

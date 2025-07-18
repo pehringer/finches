@@ -1,6 +1,6 @@
 # Finches
 
-Finches is a library that uses linear genetic programming (LGP) to automatically synthesize functions that fit input-output data.
+Finches is a library that uses linear genetic programming (LGP) to automatically synthesize functions that fit many sets of input-output data.
 It’s designed for discovering deterministic mappings from structured data.
 
 # Use Cases
@@ -10,6 +10,43 @@ For example, Finches can help uncover the rules behind proprietary black-box sys
 
 - **Data Compression** - Evolve compact functions that approximate large datasets.
 By replacing raw data with concise models, Finches enables significant reductions in storage for structured, deterministic data.
+
+# Use Finches
+
+Create a **input.csv** file where each line contains **example input(s) followd by the expected output**.
+
+A **input.csv** file that holds inputs and outputs for ```f(x, y, z) = 2*x*y + 3*z^2 - x + 5```:
+```
+2.175702178,3.4978843946,2.8679357454,42.7201735336
+3.727866762,4.6107086188,-3.4225095225,70.7890623513
+-1.6914281809,-4.2087394179,2.475850641,39.3184982846
+0.4793454968,3.6758416723,-2.3773138762,24.9995146063
+2.0264537683,-0.8547617596,-4.7856914722,68.217804457
+-3.1671669278,-0.8226972678,-3.4907083169,49.9335397455
+0.5837987947,-4.7796641015,-4.1819232422,51.3009229327
+-3.8194496568,-0.2562750524,4.7254929564,77.767960022
+...
+```
+
+Run Finches in the same directory as the **input.csv** file.
+Finches will evolve a function that fits the **input.csv** data.
+```
+$ ./finches
+Instructions: 15 Error: 0.000000%
+```
+
+Finches will create a **output.go** file containing equivalent Go code for the evolved function.
+
+Executing **output.go** with the first set of inputs from **input.csv**:
+```
+$ go run output.go 2.175702178 3.4978843946 2.8679357454
+42.72017329302451
+```
+
+
+
+
+
 
 # Finches Instruction Set Architecture (ISA)
 
@@ -26,14 +63,18 @@ Finally, the **inclusion of inverse operations** (e.g., addition and subtraction
 This allows instructions to be effectively "undone" or counteracted, which further contributes to a smoother solution landscape and enhances Finches ability to explore.
 
 These design choices, including the **compact uniform 16-bit instruction format**, collectively contribute to a significantly reduced search space for LGP to explore.
-By constraining these architectural dimensions, Finches can more efficiently navigate the solution landscape, making the evolutionary process more efficient.
+By constraining these architectural dimensions, Finches can more efficiently navigate the solution landscape, making the evolutionary process faster.
 
-**Instruction Format:**
+### Instruction Format:
+
 |OPCODE |RESULT|FIRST|SECOND|
 |-------|------|-----|------|
 |[15-12]|[11-8]|[7-4]|[3-0] |
 
-**Instruction Set:**
+### Instruction Set:
+
+**NOTE:** All instruction return NaN (Not a Number) or Inf (Infinity) for invalid operands. This allows for continued program execution instead of program termination.
+
 |OPCODE|Mnemonic|Pseudocode                                        |
 |------|--------|--------------------------------------------------|
 |0000  |AD      |```R[RESULT] = R[FIRST] + R[SECOND]```            |
@@ -53,19 +94,17 @@ By constraining these architectural dimensions, Finches can more efficiently nav
 |1110  |LT      |```R[RESULT] = 1 if R[FIRST] < R[SECOND] else 0```|
 |1111  |GT      |```R[RESULT] = 1 if R[FIRST] > R[SECOND] else 0```|
 
-**NOTE:** Operations return NaN (Not a Number) or Inf (Infinity) for invalid operands.
-
 # Finches Genetic Algorithm (GA)
 
 **Finches GA is designed to be as simple as possible, yet still capable of eliciting complex and desirable evolutionary behaviors**.
 It promotes slow population convergence, encourages depth-first and breadth-first exploration of the solution space, and **manages genome size and bloat**.
-Furthermore, it **minimize program breakage**, ensuring genetic operations are less disruptive to evolving programs.
-All these design choices not only contribute to a smoother fitness landscape but also directly enhance performance by simplifying computational overhead.
+Furthermore, it **minimizes program breakage**, ensuring genetic operations are less disruptive to evolving programs.
+All of these design choices not only contribute to a smoother fitness landscape but also directly enhance performance by simplifying computational overhead.
 
 The major difference in the GA is the **replacement of the traditional crossover operator with the Fission and Transfer operators**.
 These two operators simulate horizontal gene transfer, rather then the vertical gene transfer of traditional crossover.
 
-**Algorithm:**
+### Algorithm:
 - **Initialization:** Create a population of individuals. Each individual contains a very low fitness score, sixteen random constants, and a single random instruction.
 - **Loop:**
   + **Selection:** Two neighboring parents are randomly selected from population. A separate donor individual is also randomly selected from the population.

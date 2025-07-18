@@ -161,6 +161,10 @@ func evolve(generations, population int, inputs [][]float64, outputs []float64) 
 		total += math.Abs(outputs[i])
 	}
 	alpha := terminate(individuals)
-	fmt.Printf("\r%d %.2f%%\n", len(alpha.instructions), alpha.fitness/total*100)
+	fmt.Printf("\rInstructions: %d Error: %f%%\n", len(alpha.instructions), alpha.fitness/total*100)
+
+	for i := range min(len(inputs), len(outputs), 16) {
+		fmt.Println(simulateProgram(inputs[i], alpha.constants, alpha.instructions))
+	}
 	return alpha.constants, alpha.instructions
 }
