@@ -13,7 +13,7 @@ By replacing raw data with concise models, Finches enables significant reduction
 
 # Use Finches
 
-Create a **input.csv** file where each line contains **example input(s) followd by the expected output**.
+Create a **input.csv** file where each line contains **example input(s) followed by the SINGLE expected output**.
 
 A **input.csv** file that holds inputs and outputs for ```f(x, y, z) = 2*x*y + 3*z^2 - x + 5```:
 ```
@@ -31,17 +31,32 @@ A **input.csv** file that holds inputs and outputs for ```f(x, y, z) = 2*x*y + 3
 Run Finches in the same directory as the **input.csv** file.
 Finches will evolve a function that fits the **input.csv** data.
 ```
-$ ./finches
+$ finches
 Instructions: 15 Error: 0.000000%
 ```
 
 Finches will create a **output.go** file containing equivalent Go code for the evolved function.
 
-Executing **output.go** with the first set of inputs from **input.csv**:
+Executing **output.go** with the first lines inputs from **input.csv**:
 ```
 $ go run output.go 2.175702178 3.4978843946 2.8679357454
 42.72017329302451
 ```
+
+Here is a more complex command that demonstrates all of Finches options:
+```
+$ finches -i path/to/myData.csv -p 2000 -g 8000 -o path/for/myOutput.go
+```
+- **-g** / **--generations**
+  + Number of generation to evolve.
+- **-i** / **--input**
+  + Filepath to the input-output examples.
+- **-o** / **--output**
+  + Filepath for the evolved function.
+- **-p** / **--population**
+  + Number of individuals per generation.
+
+
 
 
 
@@ -73,26 +88,30 @@ By constraining these architectural dimensions, Finches can more efficiently nav
 
 ### Instruction Set:
 
-**NOTE:** All instruction return NaN (Not a Number) or Inf (Infinity) for invalid operands. This allows for continued program execution instead of program termination.
+**NOTE:** Instructions return NaN (Not a Number) or Inf (Infinity) for invalid operands.
+This allows for continued program execution instead of program termination.
 
-|OPCODE|Mnemonic|Pseudocode                                        |
-|------|--------|--------------------------------------------------|
-|0000  |AD      |```R[RESULT] = R[FIRST] + R[SECOND]```            |
-|0001  |SB      |```R[RESULT] = R[FIRST] - R[SECOND]```            |
-|0010  |ML      |```R[RESULT] = R[FIRST] * R[SECOND]```            |
-|0011  |DV      |```R[RESULT] = R[FIRST] / R[SECOND]```            |
-|0100  |PW      |```R[RESULT] = pow(R[FIRST], R[SECOND])```        |
-|0101  |SQ      |```R[RESULT] = sqrt(R[FIRST])```                  |
-|0110  |EX      |```R[RESULT] = exp(R[FIRST])```                   |
-|0111  |LG      |```R[RESULT] = log(R[FIRST])```                   |
-|1000  |SN      |```R[RESULT] = sin(R[FIRST])```                   |
-|1001  |AS      |```R[RESULT] = asin(R[FIRST])```                  |
-|1010  |CS      |```R[RESULT] = cos(R[FIRST])```                   |
-|1011  |AC      |```R[RESULT] = acos(R[FIRST])```                  |
-|1100  |MN      |```R[RESULT] = min(R[FIRST], R[SECOND])```        |
-|1101  |MX      |```R[RESULT] = max(R[FIRST], R[SECOND])```        |
-|1110  |LT      |```R[RESULT] = 1 if R[FIRST] < R[SECOND] else 0```|
-|1111  |GT      |```R[RESULT] = 1 if R[FIRST] > R[SECOND] else 0```|
+**NOTE:** Constants are preloaded into the registers before program execution.
+This eliminates the need for special registers and allows for uniform register access.
+
+|OPCODE|Mnemonic|Pseudocode                                                          |
+|------|--------|--------------------------------------------------------------------|
+|0000  |AD      |register[RESULT] = register[FIRST] + register[SECOND]```            |
+|0001  |SB      |register[RESULT] = register[FIRST] - register[SECOND]```            |
+|0010  |ML      |register[RESULT] = register[FIRST] * register[SECOND]```            |
+|0011  |DV      |register[RESULT] = register[FIRST] / register[SECOND]```            |
+|0100  |PW      |register[RESULT] = pow(register[FIRST], register[SECOND])```        |
+|0101  |SQ      |register[RESULT] = sqrt(register[FIRST])```                         |
+|0110  |EX      |register[RESULT] = exp(register[FIRST])```                          |
+|0111  |LG      |register[RESULT] = log(register[FIRST])```                          |
+|1000  |SN      |register[RESULT] = sin(register[FIRST])```                          |
+|1001  |AS      |register[RESULT] = asin(register[FIRST])```                         |
+|1010  |CS      |register[RESULT] = cos(register[FIRST])```                          |
+|1011  |AC      |register[RESULT] = acos(register[FIRST])```                         |
+|1100  |MN      |register[RESULT] = min(register[FIRST], register[SECOND])```        |
+|1101  |MX      |register[RESULT] = max(register[FIRST], register[SECOND])```        |
+|1110  |LT      |register[RESULT] = 1 if register[FIRST] < register[SECOND] else 0```|
+|1111  |GT      |register[RESULT] = 1 if register[FIRST] > register[SECOND] else 0```|
 
 # Finches Genetic Algorithm (GA)
 
@@ -103,6 +122,8 @@ All of these design choices not only contribute to a smoother fitness landscape 
 
 The major difference in the GA is the **replacement of the traditional crossover operator with the Fission and Transfer operators**.
 These two operators simulate horizontal gene transfer, rather then the vertical gene transfer of traditional crossover.
+
+Additionally, the **selection and replacement operators are designed to slow down premature convergence** and enable robust local and global search. While their simplicity allows for fast execution and reduced memory allocations.
 
 ### Algorithm:
 - **Initialization:** Create a population of individuals. Each individual contains a very low fitness score, sixteen random constants, and a single random instruction.

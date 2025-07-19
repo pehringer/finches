@@ -16,11 +16,11 @@ var (
 func parseGenerations(argument string) {
 	value, err := strconv.ParseInt(argument, 10, 32)
 	if err != nil {
-		fmt.Println("[-g / --generations] must be a integer number")
+		fmt.Println("-g --generations : must be a integer number")
 		os.Exit(-1)
 	}
 	if value <= 0 {
-		fmt.Println("[-g / --generations] must be greater than 0")
+		fmt.Println("-g --generations : must be greater than 0")
 		os.Exit(-1)
 	}
 	optionG = int(value)
@@ -29,11 +29,11 @@ func parseGenerations(argument string) {
 func parsePopulation(argument string) {
 	value, err := strconv.ParseInt(argument, 10, 32)
 	if err != nil {
-		fmt.Println("[-p / --population] must be a integer number")
+		fmt.Println("-p --population : must be a integer number")
 		os.Exit(-1)
 	}
 	if value <= 2 {
-		fmt.Println("[-p / --population] must be greater than 2")
+		fmt.Println("-p --population : must be greater than 2")
 		os.Exit(-1)
 	}
 	optionP = int(value)
@@ -64,6 +64,11 @@ func main() {
 			parsePopulation(os.Args[i+1])
 		default:
 			fmt.Println("invalid option:", os.Args[i])
+			fmt.Println("valid option:")
+			fmt.Println("-g  --generations  number of generation to evolve")
+			fmt.Println("-i  --input        filepath to the input-output examples (.csv)")
+			fmt.Println("-o  --output       filepath for the evolved function (.go)")
+			fmt.Println("-p  --population   number of individuals per generation")
 			os.Exit(-1)
 		}
 	}
