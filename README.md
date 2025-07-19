@@ -15,7 +15,7 @@ By replacing raw data with concise models, Finches enables significant reduction
 
 Create a **input.csv** file where each line contains **example input(s) followed by the SINGLE expected output**.
 
-A **input.csv** file that holds inputs and outputs for ```f(x, y, z) = 2*x*y + 3*z^2 - x + 5```:
+For example a **input.csv** for a three input function:
 ```
 2.175702178,3.4978843946,2.8679357454,42.7201735336
 3.727866762,4.6107086188,-3.4225095225,70.7890623513
@@ -25,19 +25,25 @@ A **input.csv** file that holds inputs and outputs for ```f(x, y, z) = 2*x*y + 3
 -3.1671669278,-0.8226972678,-3.4907083169,49.9335397455
 0.5837987947,-4.7796641015,-4.1819232422,51.3009229327
 -3.8194496568,-0.2562750524,4.7254929564,77.767960022
-...
+-3.2942570245,2.4734392713,1.5534051521,-0.7628296637
+-0.2975551098,-4.5018374909,0.5470816154,8.8745394888
+0.8429004267,2.4176065495,-2.1438009046,22.0203497133
+-0.8824430962,0.9755978955,0.7106055863,5.6755047387
+-2.0692284587,-1.6842422241,-2.8357669579,38.1641150601
+0.557997777,-4.339746829,-0.99579524,2.5736885366
+4.4987170938,2.2281464346,4.1271759253,71.6496271677
+3.9986431397,1.2608830478,-0.2652827417,11.2961243578
 ```
 
-Run Finches in the same directory as the **input.csv** file.
-Finches will evolve a function that fits the **input.csv** data.
+Run Finches in the same directory as the **input.csv** file:
 ```
 $ finches
 Instructions: 15 Error: 0.000000%
 ```
 
-Finches will create a **output.go** file containing equivalent Go code for the evolved function.
+Finches will evolve a function that fits the **input.csv** data and create a **output.go** file with equivalent Go code.
 
-Executing **output.go** with the first lines inputs from **input.csv**:
+Executing **output.go** with **input.csv** first line of example inputs:
 ```
 $ go run output.go 2.175702178 3.4978843946 2.8679357454
 42.72017329302451
@@ -55,13 +61,6 @@ $ finches -i path/to/myData.csv -p 2000 -g 8000 -o path/for/myOutput.go
   + Filepath for the evolved function.
 - **-p** / **--population**
   + Number of individuals per generation.
-
-
-
-
-
-
-
 
 # Finches Instruction Set Architecture (ISA)
 
