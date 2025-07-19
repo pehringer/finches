@@ -128,7 +128,7 @@ These two operators simulate horizontal gene transfer resulting minimal breakage
 Additionally, the **selection and replacement operators are designed to slow down premature convergence** and enable robust local exploration. While their simplicity allows for fast execution and reduced memory allocations.
 
 ### Algorithm:
-- **Initialization:** Create a population of individuals. Each individual contains a very low fitness score, sixteen random constants, and a single random instruction.
+- **Initialization:** Create a population of individuals. Each individual contains a very low fitness score, multiple (sixteen) random constants, and a single random instruction.
 - **Loop:**
   + **Selection:** Two neighboring parents are randomly selected from the population. A separate donor individual is also randomly selected from the population.
   + **Replacement:** The parent with the lower fitness score (or if equal, the one with a higher instruction count) is selected to be the new offspring.
@@ -140,4 +140,4 @@ Additionally, the **selection and replacement operators are designed to slow dow
     * An instruction is randomly inserted (with a new random one).
   + **Transfer:** With a small probability, a small random block of instructions from the donor is copied and randomly inserted into the offspring.
   + **Evaluation:** The offspring's fitness score is calculated by running a series of test cases. NaN or Infinity results are heavily penalized.
-- **Termination:** The individual with the highest fitness score is selected. Its constants and instructions are returned.
+- **Termination:** The constants and instructions from the individual with the highest fitness score are returned.
