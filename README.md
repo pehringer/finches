@@ -133,7 +133,7 @@ Additionally, the **selection and replacement operators are designed to slow dow
 ### Algorithm:
 - **Initialization:** Create a population of individuals. Each individual contains a very low fitness score, sixteen random constants, and a single random instruction.
 - **Loop:**
-  + **Selection:** Two neighboring parents are randomly selected from population. A separate donor individual is also randomly selected from the population.
+  + **Selection:** Two neighboring parents are randomly selected from the population. A separate donor individual is also randomly selected from the population.
   + **Replacement:** The parent with the lower fitness score (or if equal, the one with a higher instruction count) is selected to be the new offspring.
   + **Fission:** The offspring's instructions and constants are replaced with a copy of the remaining parent's instructions and constants.
   + **Mutation:** The offspring then undergoes one of the following mutations:
