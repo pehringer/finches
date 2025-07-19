@@ -138,6 +138,6 @@ Additionally, the **selection and replacement operators are designed to slow dow
     * An instruction is randomly replaced (with a new random one).
     * An instruction is randomly deleted.
     * An instruction is randomly inserted (with a new random one).
-  + **Transfer:** With a small probability, a small random block of instructions is copied from the donor and is randomly inserted into the offspring.
+  + **Transfer:** With a small probability, a small random block of instructions from the donor is copied and randomly inserted into the offspring.
   + **Evaluation:** The offspring's fitness score is calculated by running a series of test cases. NaN or Infinity results are heavily penalized.
 - **Termination:** The individual with the highest fitness score is selected. Its constants and instructions are returned.
