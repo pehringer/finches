@@ -7,15 +7,12 @@
 ```
 
 Finches is a library that uses linear genetic programming (LGP) to synthesize functions from of input-output examples.
-It’s designed for discovering deterministic mappings from structured data.
 
 # Use Cases
 
 - **Reverse Engineering** - Infer hidden logic from observed inputs and outputs, even when source code or hardware is unavailable.
-For example, Finches can help uncover the rules behind proprietary black-box systems by modeling their behavior.
 
-- **Data Compression** - Evolve compact functions that approximate large datasets.
-By replacing raw data with concise functions, Finches enables significant reductions in storage for structured, deterministic data.
+- **Data Compression** - Evolve compact functions that approximate large datasets, allowing for significant reductions in storage.
 
 # Use Finches
 
