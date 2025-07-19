@@ -94,24 +94,24 @@ This allows for continued program execution instead of program termination.
 **NOTE:** Constants are preloaded into the registers before program execution.
 This eliminates the need for special registers and allows for uniform register access.
 
-|OPCODE|Mnemonic|Pseudocode                                                          |
-|------|--------|--------------------------------------------------------------------|
-|0000  |AD      |register[RESULT] = register[FIRST] + register[SECOND]```            |
-|0001  |SB      |register[RESULT] = register[FIRST] - register[SECOND]```            |
-|0010  |ML      |register[RESULT] = register[FIRST] * register[SECOND]```            |
-|0011  |DV      |register[RESULT] = register[FIRST] / register[SECOND]```            |
-|0100  |PW      |register[RESULT] = pow(register[FIRST], register[SECOND])```        |
-|0101  |SQ      |register[RESULT] = sqrt(register[FIRST])```                         |
-|0110  |EX      |register[RESULT] = exp(register[FIRST])```                          |
-|0111  |LG      |register[RESULT] = log(register[FIRST])```                          |
-|1000  |SN      |register[RESULT] = sin(register[FIRST])```                          |
-|1001  |AS      |register[RESULT] = asin(register[FIRST])```                         |
-|1010  |CS      |register[RESULT] = cos(register[FIRST])```                          |
-|1011  |AC      |register[RESULT] = acos(register[FIRST])```                         |
-|1100  |MN      |register[RESULT] = min(register[FIRST], register[SECOND])```        |
-|1101  |MX      |register[RESULT] = max(register[FIRST], register[SECOND])```        |
-|1110  |LT      |register[RESULT] = 1 if register[FIRST] < register[SECOND] else 0```|
-|1111  |GT      |register[RESULT] = 1 if register[FIRST] > register[SECOND] else 0```|
+|OPCODE|Mnemonic|Pseudocode                                                       |
+|------|--------|-----------------------------------------------------------------|
+|0000  |AD      |register[RESULT] = register[FIRST] + register[SECOND]            |
+|0001  |SB      |register[RESULT] = register[FIRST] - register[SECOND]            |
+|0010  |ML      |register[RESULT] = register[FIRST] * register[SECOND]            |
+|0011  |DV      |register[RESULT] = register[FIRST] / register[SECOND]            |
+|0100  |PW      |register[RESULT] = pow(register[FIRST], register[SECOND])        |
+|0101  |SQ      |register[RESULT] = sqrt(register[FIRST])                         |
+|0110  |EX      |register[RESULT] = exp(register[FIRST])                          |
+|0111  |LG      |register[RESULT] = log(register[FIRST])                          |
+|1000  |SN      |register[RESULT] = sin(register[FIRST])                          |
+|1001  |AS      |register[RESULT] = asin(register[FIRST])                         |
+|1010  |CS      |register[RESULT] = cos(register[FIRST])                          |
+|1011  |AC      |register[RESULT] = acos(register[FIRST])                         |
+|1100  |MN      |register[RESULT] = min(register[FIRST], register[SECOND])        |
+|1101  |MX      |register[RESULT] = max(register[FIRST], register[SECOND])        |
+|1110  |LT      |register[RESULT] = 1 if register[FIRST] < register[SECOND] else 0|
+|1111  |GT      |register[RESULT] = 1 if register[FIRST] > register[SECOND] else 0|
 
 # Finches Genetic Algorithm (GA)
 
