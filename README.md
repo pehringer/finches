@@ -1,4 +1,8 @@
-# Finches
+```
+    //>
+   //)    F  I  N  C  H  E  S
+  / ^
+```
 
 Finches is a library that uses linear genetic programming (LGP) to automatically synthesize functions that fit many sets of input-output data.
 It’s designed for discovering deterministic mappings from structured data.
