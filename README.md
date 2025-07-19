@@ -6,16 +6,16 @@
 
 ```
 
-Finches is a library that uses linear genetic programming (LGP) to automatically synthesize functions that fit many sets of input-output data.
+Finches is a library that uses linear genetic programming (LGP) to synthesize functions from of input-output examples.
 It’s designed for discovering deterministic mappings from structured data.
 
 # Use Cases
 
-- **Reverse Engineering** - Infer hidden logic from input–output pairs, even when source code or hardware is unavailable.
+- **Reverse Engineering** - Infer hidden logic from observed inputs and outputs, even when source code or hardware is unavailable.
 For example, Finches can help uncover the rules behind proprietary black-box systems by modeling their behavior.
 
 - **Data Compression** - Evolve compact functions that approximate large datasets.
-By replacing raw data with concise models, Finches enables significant reductions in storage for structured, deterministic data.
+By replacing raw data with concise functions, Finches enables significant reductions in storage for structured, deterministic data.
 
 # Use Finches
 
@@ -47,9 +47,9 @@ $ finches
 Instructions: 15 Error: 0.000000%
 ```
 
-Finches will evolve a function that fits the **input.csv** data and create a **output.go** file with equivalent Go code.
+Finches will evolve a function that fits the input-output examples in **input.csv** and create a **output.go** file with equivalent Go code.
 
-Executing **output.go** with **input.csv** first line of example inputs:
+Executing **output.go** with the first example from **input.csv**:
 ```
 $ go run output.go 2.175702178 3.4978843946 2.8679357454
 42.72017329302451
@@ -60,7 +60,7 @@ Here is a more complex command that demonstrates all of Finches options:
 $ finches -i path/to/myData.csv -p 2000 -g 8000 -o path/for/myOutput.go
 ```
 - **-g** / **--generations**
-  + Number of generation to evolve.
+  + Number of generations to evolve.
 - **-i** / **--input**
   + Filepath to the input-output examples.
 - **-o** / **--output**
@@ -126,9 +126,9 @@ Furthermore, it **minimizes program breakage**, ensuring genetic operations are 
 All of these design choices not only contribute to a smoother fitness landscape but also directly enhance performance by simplifying computational overhead.
 
 The major difference in the GA is the **replacement of the traditional crossover operator with the Fission and Transfer operators**.
-These two operators simulate horizontal gene transfer, rather then the vertical gene transfer of traditional crossover.
+These two operators simulate horizontal gene transfer resulting minimal breakage and strong global exploration.
 
-Additionally, the **selection and replacement operators are designed to slow down premature convergence** and enable robust local and global search. While their simplicity allows for fast execution and reduced memory allocations.
+Additionally, the **selection and replacement operators are designed to slow down premature convergence** and enable robust local exploration. While their simplicity allows for fast execution and reduced memory allocations.
 
 ### Algorithm:
 - **Initialization:** Create a population of individuals. Each individual contains a very low fitness score, sixteen random constants, and a single random instruction.
