@@ -11,7 +11,7 @@ func invalidArguments() {
   //>
  //)    f  i  n  c  h  e  s
 / ^
-	
+
 command format:
 	finches [EXAMPLES_CSV_FILEPATH] [OPTION] . . .
 command options:
@@ -78,6 +78,7 @@ func main() {
 		os.Exit(-1)
 	}
 	constants, instructions := evolve(generations, individuals, inputs, outputs)
+	fmt.Printf(" -> %s\n", destination)
 	err = writeProgram(destination, len(inputs[0]), constants, instructions)
 	if err != nil {
 		fmt.Println(err)

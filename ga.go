@@ -161,6 +161,6 @@ func evolve(generations, individuals int, inputs [][]float64, outputs []float64)
 		fmt.Printf("\r%.2f%%", float64(i)/float64(generations)*100)
 	}
 	alpha := terminate(population)
-	fmt.Printf("\rinstructions: %d error: %f%%\n", len(alpha.instructions), alpha.fitness/total*100)
+	fmt.Printf("\rinstructions: %d error: %f%%", len(alpha.instructions), alpha.fitness/total*100)
 	return alpha.constants, alpha.instructions
 }

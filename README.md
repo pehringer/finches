@@ -49,15 +49,15 @@ The above file contains 16 input-output examples, ideally you want at least 256 
 Run finches on **examples.csv**, adjust the **--generations** and or **--individuals** counts if the resulting ```error``` or number of ```instructions``` is too high:
 ```
 $ ./finches examples.csv
-instructions: 1 error: 69.621665%
+instructions: 1 error: 69.621665% -> function.go
 ```
 ```
 $ ./finches examples.csv --generations 4096
-instructions: 47 error: 6.069102%
+instructions: 47 error: 6.069102% -> function.go
 ```
 ```
 $ ./finches examples.csv --generations 4096 --individuals 1024
-instructions: 20 error: 0.000000%
+instructions: 20 error: 0.000000% -> function.go
 ```
 
 Genetic algorithms at their core rely on randomness so your result may vary.
@@ -72,7 +72,8 @@ go run function.go 2.175702178 3.4978843946 2.8679357454
 
 The filepath for the evolved function can also be changed:
 ```
-$ ./finches examples.csv --destination foo/bar.go
+$ ./finches examples.csv --destination fooBar.go
+instructions: 29 error: 7.706219% -> fooBar.go
 ```
 
 # Finches Instruction Set Architecture (ISA)
