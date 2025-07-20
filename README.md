@@ -24,7 +24,7 @@ go build -o finches
 
 Create a **examples.csv** file where each line contains **example input(s) followed by the SINGLE expected output**.
 
-A **examples.csv** for a three input function:
+A **examples.csv** file for a three input function:
 ```
 2.175702178,3.4978843946,2.8679357454,42.7201735336
 3.727866762,4.6107086188,-3.4225095225,70.7890623513
@@ -44,7 +44,7 @@ A **examples.csv** for a three input function:
 3.9986431397,1.2608830478,-0.2652827417,11.2961243578
 ```
 
-The above example contains 16 input-output examples, ideally you want at least 256 examples.
+The above file contains 16 input-output examples, ideally you want at least 256 examples.
 
 Run finches on **examples.csv**, adjust the **--generations** and or **--individuals** counts if the resulting ```error``` or number of ```instructions``` is too high:
 ```
