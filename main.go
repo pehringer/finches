@@ -6,79 +6,79 @@ import (
 	"strconv"
 )
 
-var (
-	optionG int    = 10000
-	optionI string = "input.csv"
-	optionO string = "output.go"
-	optionP int    = 1000
-)
+func invalidArguments() {
+	fmt.Print(`
+  //>
+ //)    f  i  n  c  h  e  s
+/ ^
+	
+command format:
+	finches [EXAMPLES_CSV_FILEPATH] [OPTION] . . .
+command options:
+	-d / --destination  [FILEPATH]
+	-g / --generations  [NUMBER]
+	-i / --individuals  [NUMBER]
+hints:
+	adjust the --generations and or --individuals counts
+	if the resulting 'error' or number of 'instructions'
+	is too high
 
-func parseGenerations(argument string) {
-	value, err := strconv.ParseInt(argument, 10, 32)
-	if err != nil {
-		fmt.Println("-g --generations : must be a integer number")
-		os.Exit(-1)
-	}
-	if value <= 0 {
-		fmt.Println("-g --generations : must be greater than 0")
-		os.Exit(-1)
-	}
-	optionG = int(value)
-}
-
-func parsePopulation(argument string) {
-	value, err := strconv.ParseInt(argument, 10, 32)
-	if err != nil {
-		fmt.Println("-p --population : must be a integer number")
-		os.Exit(-1)
-	}
-	if value <= 2 {
-		fmt.Println("-p --population : must be greater than 2")
-		os.Exit(-1)
-	}
-	optionP = int(value)
+	each line in the example.csv file must contains example
+	input(s) followed by the SINGLE expected output, for
+	example abs.csv:
+		-0.1,0.1
+		2.3,2.3
+		4.5,4.5
+		-6.7,6.7
+		-8.9,8.9
+`)
 }
 
 func main() {
-	if len(os.Args)%2 != 1 {
-		fmt.Println("invalid number of arguments:", len(os.Args))
-		os.Exit(-1)
+	if len(os.Args) < 2 {
+		invalidArguments()
+		return
 	}
-	for i := 1; i < len(os.Args); i += 2 {
+	source := os.Args[1]
+	if len(os.Args)%2 != 0 {
+		invalidArguments()
+		return
+	}
+	if source == "-h" || source == "--help" {
+		invalidArguments()
+		return
+	}
+	destination := "function.go"
+	generations := 2048
+	individuals := 512
+	for i := 2; i < len(os.Args); i += 2 {
 		switch os.Args[i] {
+		case "-d":
+			fallthrough
+		case "--destination":
+			destination = os.Args[i+1]
 		case "-g":
 			fallthrough
 		case "--generations":
-			parseGenerations(os.Args[i+1])
+			number, _ := strconv.ParseInt(os.Args[i+1], 10, 64)
+			generations = int(number)
 		case "-i":
 			fallthrough
-		case "--input":
-			optionI = os.Args[i+1]
-		case "-o":
-			fallthrough
-		case "--output":
-			optionO = os.Args[i+1]
-		case "-p":
-			fallthrough
-		case "--population":
-			parsePopulation(os.Args[i+1])
+		case "--individuals":
+			number, _ := strconv.ParseInt(os.Args[i+1], 10, 64)
+			individuals = int(number)
 		default:
-			fmt.Println("invalid option:", os.Args[i])
-			fmt.Println("valid option:")
-			fmt.Println("-g  --generations  number of generation to evolve")
-			fmt.Println("-i  --input        filepath to the input-output examples (.csv)")
-			fmt.Println("-o  --output       filepath for the evolved function (.go)")
-			fmt.Println("-p  --population   number of individuals per generation")
-			os.Exit(-1)
+			invalidArguments()
+			return
 		}
 	}
-	inputs, outputs, err := readExamples(optionI)
+	inputs, outputs, err := readExamples(source)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
-	constants, instructions := evolve(optionG, optionP, inputs, outputs)
-	err = writeProgram(optionO, len(inputs[0]), constants, instructions)
+	constants, instructions := evolve(generations, individuals, inputs, outputs)
+	err = writeProgram(destination, len(inputs[0]), constants, instructions)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)

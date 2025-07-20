@@ -14,11 +14,11 @@ type individual struct {
 	instructions []uint16
 }
 
-func initialize(population int, outputs []float64) []individual {
-	individuals := make([]individual, population)
+func initialize(individuals int) []individual {
+	population := make([]individual, individuals)
 	for i := range individuals {
-		individuals[i].fitness = math.MaxFloat64
-		individuals[i].constants = []float64{
+		population[i].fitness = math.MaxFloat64
+		population[i].constants = []float64{
 			rand.Float64()*200.0 - 100.0,
 			rand.Float64()*200.0 - 100.0,
 			rand.Float64()*200.0 - 100.0,
@@ -36,21 +36,21 @@ func initialize(population int, outputs []float64) []individual {
 			rand.Float64()*200.0 - 100.0,
 			rand.Float64()*200.0 - 100.0,
 		}
-		individuals[i].instructions = []uint16{
+		population[i].instructions = []uint16{
 			uint16(rand.Int()),
 		}
 	}
-	return individuals
+	return population
 }
 
-func seleCt(individuals []individual) (*individual, *individual, *individual) {
-	i := rand.Intn(len(individuals))
-	j := (i + 1) % len(individuals)
-	k := rand.Intn(len(individuals))
+func seleCt(population []individual) (*individual, *individual, *individual) {
+	i := rand.Intn(len(population))
+	j := (i + 1) % len(population)
+	k := rand.Intn(len(population))
 	for k == i || k == j {
-		k = rand.Intn(len(individuals))
+		k = rand.Intn(len(population))
 	}
-	return &individuals[i], &individuals[j], &individuals[k]
+	return &population[i], &population[j], &population[k]
 }
 
 func replace(parentX, parentY *individual) (*individual, *individual) {
@@ -125,26 +125,26 @@ func evaluate(inputs [][]float64, outputs []float64, penalty float64, offspring 
 	}
 }
 
-func terminate(individuals []individual) *individual {
-	alpha := &individuals[0]
-	for i := range individuals {
-		if individuals[i].fitness < alpha.fitness {
-			alpha = &individuals[i]
+func terminate(population []individual) *individual {
+	alpha := &population[0]
+	for i := range population {
+		if population[i].fitness < alpha.fitness {
+			alpha = &population[i]
 		}
 	}
 	return alpha
 }
 
-func evolve(generations, population int, inputs [][]float64, outputs []float64) ([]float64, []uint16) {
+func evolve(generations, individuals int, inputs [][]float64, outputs []float64) ([]float64, []uint16) {
 	total := 0.0
 	for i := range outputs {
 		total += math.Abs(outputs[i])
 	}
-	individuals := initialize(population, outputs)
+	population := initialize(individuals)
 	for i := range generations {
 		wg := sync.WaitGroup{}
-		for range population {
-			parentX, parentY, donor := seleCt(individuals)
+		for range individuals {
+			parentX, parentY, donor := seleCt(population)
 			parentX.mu.Lock()
 			parentY.mu.Lock()
 			donor.mu.Lock()
@@ -160,7 +160,7 @@ func evolve(generations, population int, inputs [][]float64, outputs []float64) 
 		wg.Wait()
 		fmt.Printf("\r%.2f%%", float64(i)/float64(generations)*100)
 	}
-	alpha := terminate(individuals)
-	fmt.Printf("\rInstructions: %d Error: %f%%\n", len(alpha.instructions), alpha.fitness/total*100)
+	alpha := terminate(population)
+	fmt.Printf("\rinstructions: %d error: %f%%\n", len(alpha.instructions), alpha.fitness/total*100)
 	return alpha.constants, alpha.instructions
 }

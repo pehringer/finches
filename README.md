@@ -1,12 +1,12 @@
 ```
 
   //>
- //)    F  I  N  C  H  E  S
+ //)    f  i  n  c  h  e  s
 / ^
 
 ```
 
-Finches is a library that uses linear genetic programming (LGP) to synthesize functions from of input-output examples.
+Finches is a library that uses linear genetic programming (LGP) to evolve functions from of input-output examples.
 
 # Use Cases
 
@@ -16,9 +16,15 @@ Finches is a library that uses linear genetic programming (LGP) to synthesize fu
 
 # Use Finches
 
-Create a **input.csv** file where each line contains **example input(s) followed by the SINGLE expected output**.
+Run the Makefile to build finches:
+```
+$ make
+go build -o finches
+```
 
-For example a **input.csv** for a three input function:
+Create a **examples.csv** file where each line contains **example input(s) followed by the SINGLE expected output**.
+
+A **examples.csv** for a three input function:
 ```
 2.175702178,3.4978843946,2.8679357454,42.7201735336
 3.727866762,4.6107086188,-3.4225095225,70.7890623513
@@ -38,32 +44,36 @@ For example a **input.csv** for a three input function:
 3.9986431397,1.2608830478,-0.2652827417,11.2961243578
 ```
 
-Run Finches in the same directory as the **input.csv** file:
+The above example contains 16 input-output examples, ideally you want at least 256 examples.
+
+Run finches on **examples.csv**, adjust the **--generations** and or **--individuals** counts if the resulting ```error``` or number of ```instructions``` is too high:
 ```
-$ finches
-Instructions: 15 Error: 0.000000%
+$ ./finches examples.csv
+instructions: 1 error: 69.621665%
+```
+```
+$ ./finches examples.csv --generations 4096
+instructions: 47 error: 6.069102%
+```
+```
+$ ./finches examples.csv --generations 4096 --individuals 1024
+instructions: 20 error: 0.000000%
 ```
 
-Finches will evolve a function that fits the input-output examples in **input.csv** and create a **output.go** file with equivalent Go code.
+Genetic algorithms at their core rely on randomness so your result may vary.
 
-Executing **output.go** with the first example from **input.csv**:
+Finches will evolve a function to fit the input-output examples and create a **function.go** file with equivalent Go code.
+
+Executing **function.go** with the first example from **input.csv**:
 ```
-$ go run output.go 2.175702178 3.4978843946 2.8679357454
-42.72017329302451
+go run function.go 2.175702178 3.4978843946 2.8679357454
+42.720173532676014
 ```
 
-Here is a more complex command that demonstrates all of Finches options:
+The filepath for the evolved function can also be changed:
 ```
-$ finches -i path/to/myData.csv -p 2000 -g 8000 -o path/for/myOutput.go
+$ ./finches examples.csv --destination foo/bar.go
 ```
-- **-g** / **--generations**
-  + Number of generations to evolve.
-- **-i** / **--input**
-  + Filepath to the input-output examples.
-- **-o** / **--output**
-  + Filepath for the evolved function.
-- **-p** / **--population**
-  + Number of individuals per generation.
 
 # Finches Instruction Set Architecture (ISA)
 
@@ -77,10 +87,10 @@ Furthermore, this ISA **only contains arithmetic comparison operations** (such a
 This design choice provides a more incremental and continuous path for forming control flow logic when compared to all-or-nothing boolean operations (like AND, OR, NOT), further contributing to a smoother solution landscape.
 
 Finally, the **inclusion of inverse operations** (e.g., addition and subtraction, multiplication and division, sine and arcsine) creates a more uniform and balanced search space.
-This allows instructions to be effectively "undone" or counteracted, which further contributes to a smoother solution landscape and enhances Finches ability to explore.
+This allows instructions to be effectively "undone" or counteracted, which further contributes to a smoother solution landscape and enhances finches ability to explore.
 
 These design choices, including the **compact uniform 16-bit instruction format**, collectively contribute to a significantly reduced search space for LGP to explore.
-By constraining these architectural dimensions, Finches can more efficiently navigate the solution landscape, making the evolutionary process faster.
+By constraining these architectural dimensions, finches can more efficiently navigate the solution landscape, making the evolutionary process faster.
 
 ### Instruction Format:
 
