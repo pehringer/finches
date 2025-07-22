@@ -90,7 +90,7 @@ This design choice provides a more incremental and continuous path for forming c
 Finally, the **inclusion of inverse operations** (e.g., addition and subtraction, multiplication and division, sine and arcsine) creates a more uniform and balanced search space.
 This allows instructions to be effectively "undone" or counteracted, which further contributes to a smoother solution landscape and enhances finches ability to explore.
 
-These design choices, including the **compact uniform 16-bit instruction format**, collectively contribute to a significantly reduced search space for LGP to explore.
+These design choices, including the **compact uniform 16-bit instruction format** (where all bit combinations map to valid instructions), collectively contribute to a significantly reduced search space for LGP to explore.
 By constraining these architectural dimensions, finches can more efficiently navigate the solution landscape, making the evolutionary process faster.
 
 ### Instruction Format:
