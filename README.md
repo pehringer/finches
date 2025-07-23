@@ -6,7 +6,8 @@
 
 ```
 
-Finches is a library that uses linear genetic programming (LGP) to evolve functions from of input-output examples.
+Finches uses linear genetic programming (LGP) to evolve functions from input-output examples.
+The name finches comes from Darwin's finches, the canonical example of the Theory of Evolution.
 
 # Use Cases
 
