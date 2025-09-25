@@ -65,7 +65,7 @@ Genetic algorithms at their core rely on randomness so your result may vary.
 
 Finches will evolve a function to fit the input-output examples and create a **function.go** file with equivalent Go code.
 
-Executing **function.go** with the first example from **input.csv**:
+Executing **function.go** with the first example from **examples.csv**:
 ```
 go run function.go 2.175702178 3.4978843946 2.8679357454
 42.720173532676014
