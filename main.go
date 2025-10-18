@@ -23,9 +23,9 @@ hints:
 	if the resulting 'error' or number of 'instructions'
 	is too high
 
-	each line in the example.csv file must contains example
-	input(s) followed by the SINGLE expected output, for
-	example abs.csv:
+	each line in the example.csv file must contains ONE to
+	SIXTEEN example inputs followed by ONE expected output,
+	for example abs.csv:
 		-0.1,0.1
 		2.3,2.3
 		4.5,4.5

@@ -23,7 +23,7 @@ $ make
 go build -o finches
 ```
 
-Create a **examples.csv** file where each line contains **example input(s) followed by the SINGLE expected output**.
+Create a **examples.csv** file where each line contains **ONE to SIXTEEN example inputs followed by ONE expected output**.
 
 A **examples.csv** file for a three input function:
 ```
