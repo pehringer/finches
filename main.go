@@ -6,11 +6,7 @@ import (
 	"strconv"
 )
 
-func exitHelp(err error) {
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Print(`
+const help = `
   //>
  //)    f  i  n  c  h  e  s
 / ^
@@ -34,7 +30,13 @@ hints:
 		4.5,4.5
 		-6.7,6.7
 		-8.9,8.9
-`)
+`
+
+func exitHelp(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Print(help)
 	os.Exit(1)
 }
 

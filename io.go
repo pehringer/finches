@@ -112,35 +112,7 @@ var instructionFormat map[uint16]string = map[uint16]string{
 	opcodeGT: "\t%s = float(%s > %s)\n",
 }
 
-func writeProgram(path string, inputs int, constants []float64, instructions []uint16) error {
-	variables := ""
-	for i := range constants {
-		name := registerVariable[i]
-		value := constants[i]
-		variables += fmt.Sprintf("var %s float64 = %f\n", name, value)
-	}
-	arguments := ""
-	for i := range inputs {
-		name := registerVariable[i]
-		index := i + 1
-		arguments += fmt.Sprintf("\t%s, _ = strconv.ParseFloat(os.Args[%d], 64)\n", name, index)
-	}
-	code := ""
-	for i := range instructions {
-		argument1 := registerVariable[int(instructions[i] >> resultShift & shiftMask)]
-		argument2 := registerVariable[int(instructions[i] >> firstShift & shiftMask)]
-		argument3 := registerVariable[int(instructions[i] >> secondShift & shiftMask)]
-		opcode := instructions[i] & opcodeMask
-		switch instructionArguments[opcode] {
-		case 1:
-			code += fmt.Sprintf(instructionFormat[opcode], argument1)
-		case 2:
-			code += fmt.Sprintf(instructionFormat[opcode], argument1, argument2)
-		case 3:
-			code += fmt.Sprintf(instructionFormat[opcode], argument1, argument2, argument3)
-		}
-	}
-	program := fmt.Sprintf(`package main
+const programFormat = `package main
 import "os"
 import "fmt"
 import "math"
@@ -171,7 +143,37 @@ func main() {
 %s
 %s
 	fmt.Println(P)
-}`, variables, arguments, code)
+}`
+
+func writeProgram(path string, inputs int, constants []float64, instructions []uint16) error {
+	variables := ""
+	for i := range constants {
+		name := registerVariable[i]
+		value := constants[i]
+		variables += fmt.Sprintf("var %s float64 = %f\n", name, value)
+	}
+	arguments := ""
+	for i := range inputs {
+		name := registerVariable[i]
+		index := i + 1
+		arguments += fmt.Sprintf("\t%s, _ = strconv.ParseFloat(os.Args[%d], 64)\n", name, index)
+	}
+	code := ""
+	for i := range instructions {
+		argument1 := registerVariable[int(instructions[i] >> resultShift & shiftMask)]
+		argument2 := registerVariable[int(instructions[i] >> firstShift & shiftMask)]
+		argument3 := registerVariable[int(instructions[i] >> secondShift & shiftMask)]
+		opcode := instructions[i] & opcodeMask
+		switch instructionArguments[opcode] {
+		case 1:
+			code += fmt.Sprintf(instructionFormat[opcode], argument1)
+		case 2:
+			code += fmt.Sprintf(instructionFormat[opcode], argument1, argument2)
+		case 3:
+			code += fmt.Sprintf(instructionFormat[opcode], argument1, argument2, argument3)
+		}
+	}
+	program := fmt.Sprintf(programFormat, variables, arguments, code)
 	err := os.WriteFile(path, []byte(program), 0644)
 	if err != nil {
 		return fmt.Errorf("could not write file: %w", err)
