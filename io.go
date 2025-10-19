@@ -31,8 +31,14 @@ func readExamples(filename string) ([][]float64, []float64, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not read csv: %w", err)
 	}
+	if len(values) < 1 {
+		return nil, nil, fmt.Errorf("csv format: must contain a least one input-output example row")
+	}
 	if len(values[0]) < 2 {
-		return nil, nil, fmt.Errorf("expected 2 or more columns")
+		return nil, nil, fmt.Errorf("csv format: missing expected output column (last column)")
+	}
+	if len(values[0]) > 9 {
+		return nil, nil, fmt.Errorf("csv format: too many example input columns (maximum first eight columns)")
 	}
 	inputs := make([][]float64, len(values))
 	outputs := make([]float64, len(values))

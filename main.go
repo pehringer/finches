@@ -6,7 +6,10 @@ import (
 	"strconv"
 )
 
-func invalidArguments() {
+func exitHelp(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Print(`
   //>
  //)    f  i  n  c  h  e  s
@@ -16,15 +19,15 @@ command format:
 	finches [EXAMPLES_CSV_FILEPATH] [OPTION] . . .
 command options:
 	-d / --destination  [FILEPATH]
-	-g / --generations  [NUMBER]
-	-i / --individuals  [NUMBER]
+	-g / --generations  [NUMBER_GREATER_THAN_ZERO]
+	-i / --individuals  [NUMBER_GREATER_THAN_THREE]
 hints:
 	adjust the --generations and or --individuals counts
 	if the resulting 'error' or number of 'instructions'
 	is too high
 
 	each line in the example.csv file must contains ONE to
-	SIXTEEN example inputs followed by ONE expected output,
+	EIGHT example inputs followed by ONE expected output,
 	for example abs.csv:
 		-0.1,0.1
 		2.3,2.3
@@ -32,21 +35,35 @@ hints:
 		-6.7,6.7
 		-8.9,8.9
 `)
+	os.Exit(1)
+}
+
+func exitError(err error) {
+	fmt.Println(err)
+	os.Exit(1)
+}
+
+func parseMinimum(value string, minimum int64) (int, error) {
+	result, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("'%s' must be an integer", value)
+	}
+	if result < minimum {
+		return 0, fmt.Errorf("'%s' must be greater than or equal to %d", value, minimum)
+	}
+	return int(result), nil
 }
 
 func main() {
 	if len(os.Args) < 2 {
-		invalidArguments()
-		return
+		exitHelp(fmt.Errorf("missing examples csv filepath"))
 	}
 	source := os.Args[1]
 	if len(os.Args)%2 != 0 {
-		invalidArguments()
-		return
+		exitHelp(fmt.Errorf("'%s' missing argument", os.Args[len(os.Args)-1]))
 	}
 	if source == "-h" || source == "--help" {
-		invalidArguments()
-		return
+		exitHelp(nil)
 	}
 	destination := "function.go"
 	generations := 2048
@@ -60,28 +77,31 @@ func main() {
 		case "-g":
 			fallthrough
 		case "--generations":
-			number, _ := strconv.ParseInt(os.Args[i+1], 10, 64)
-			generations = int(number)
+			number, err := parseMinimum(os.Args[i+1], 1)
+			if err != nil {
+				exitHelp(fmt.Errorf("-g / --generations %w", err))
+			}
+			generations = number
 		case "-i":
 			fallthrough
 		case "--individuals":
-			number, _ := strconv.ParseInt(os.Args[i+1], 10, 64)
-			individuals = int(number)
+			number, err := parseMinimum(os.Args[i+1], 3)
+			if err != nil {
+				exitHelp(fmt.Errorf("-i / --individuals %w", err))
+			}
+			individuals = number
 		default:
-			invalidArguments()
-			return
+			exitHelp(fmt.Errorf("'%s' unknown option", os.Args[i]))
 		}
 	}
 	inputs, outputs, err := readExamples(source)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		exitError(err)
 	}
 	constants, instructions := evolve(generations, individuals, inputs, outputs)
 	fmt.Printf(" -> %s\n", destination)
 	err = writeProgram(destination, len(inputs[0]), constants, instructions)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		exitError(err)
 	}
 }

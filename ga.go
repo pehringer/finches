@@ -100,7 +100,7 @@ func mutate(offspring *individual) *individual {
 }
 
 func transfer(donor, offspring *individual) *individual {
-	if rand.Float64() < 0.01 {
+	if rand.Intn(100) == 0 {
 		n := rand.Intn(min(len(donor.instructions), 10)) + 1
 		i := rand.Intn(len(donor.instructions) + 1 - n)
 		body := donor.instructions[i : i+n]
