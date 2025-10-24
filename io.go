@@ -162,10 +162,11 @@ func divide(n, d float64) float64 {
 %s
 func main() {
 	for i := 1; i < len(os.Args); i += %s {
+
 %s
 %s
-		fmt.Println(P)
 	}
+	fmt.Println(P)
 }`
 
 func writeProgram(path string, inputs int, constants []float64, instructions []uint16) error {
