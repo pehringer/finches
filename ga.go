@@ -112,14 +112,18 @@ func transfer(donor, offspring *individual) *individual {
 	return offspring
 }
 
-func evaluate(inputs [][]float64, outputs []float64, penalty float64, offspring *individual) {
+func evaluate(inputs [][]float64, outputs [][]*float64, penalty float64, offspring *individual) {
 	offspring.fitness = 0
+	machine := setupRegisters(offspring.constants)
 	for i := range min(len(inputs), len(outputs)) {
-		output := simulateProgram(inputs[i], offspring.constants, offspring.instructions)
-		delta := math.Abs(output - outputs[i])
-		if math.IsNaN(delta) || math.IsInf(delta, 0) {
-			offspring.fitness += penalty
+		machine.executeInstructions(inputs[i], offspring.instructions)
+		if len(outputs[i]) < 1 || outputs[i][0] == nil {
 			continue
+		}
+		output := machine.resetRegisters(offspring.constants)
+		delta := math.Abs(output - *outputs[i][0])
+		if math.IsNaN(delta) || math.IsInf(delta, 0) {
+			delta = penalty
 		}
 		offspring.fitness += delta
 	}
@@ -135,10 +139,14 @@ func terminate(population []individual) *individual {
 	return alpha
 }
 
-func evolve(generations, individuals int, inputs [][]float64, outputs []float64) ([]float64, []uint16) {
+func evolve(generations, individuals int, inputs [][]float64, outputs [][]*float64) ([]float64, []uint16) {
 	total := 0.0
 	for i := range outputs {
-		total += math.Abs(outputs[i])
+		for j := range outputs[i] {
+			if outputs[i][j] != nil {
+				total += math.Abs(*outputs[i][j])
+			}
+		}
 	}
 	population := initialize(individuals)
 	for i := range generations {
@@ -160,7 +168,7 @@ func evolve(generations, individuals int, inputs [][]float64, outputs []float64)
 		wg.Wait()
 		fmt.Printf("\r%.2f%%", float64(i)/float64(generations)*100)
 	}
+	fmt.Printf("\r100.0%%")
 	alpha := terminate(population)
-	fmt.Printf("\rinstructions: %d error: %f%%", len(alpha.instructions), alpha.fitness/total*100)
 	return alpha.constants, alpha.instructions
 }

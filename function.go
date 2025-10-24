@@ -24,47 +24,50 @@ func divide(n, d float64) float64 {
 	return math.Inf(-1)
 }
 
-var A float64 = -4.563879
-var B float64 = -45.027600
-var C float64 = 55.134696
-var D float64 = 55.084808
-var E float64 = 81.762317
-var F float64 = 44.051770
-var G float64 = 37.212538
-var H float64 = 84.682005
-var I float64 = -33.626764
-var J float64 = 88.412611
-var K float64 = -81.315664
-var L float64 = 65.917293
-var M float64 = -27.110642
-var N float64 = -0.922462
-var O float64 = 16.447717
-var P float64 = 36.550981
+var A float64 = -12.567277
+var B float64 = 81.606477
+var C float64 = 45.307862
+var D float64 = 86.146217
+var E float64 = 64.306770
+var F float64 = -82.968181
+var G float64 = -32.260088
+var H float64 = 96.811005
+var I float64 = 10.356790
+var J float64 = 3.491086
+var K float64 = -58.116895
+var L float64 = -16.986303
+var M float64 = 92.462796
+var N float64 = 17.830892
+var O float64 = 31.559845
+var P float64 = -0.749817
 
 func main() {
-	A, _ = strconv.ParseFloat(os.Args[1], 64)
-	B, _ = strconv.ParseFloat(os.Args[2], 64)
-	C, _ = strconv.ParseFloat(os.Args[3], 64)
+	for i := 1; i < len(os.Args); i += 1 {
+		A, _ = strconv.ParseFloat(os.Args[i+0], 64)
 
-	H = math.Min(C, E)
-	N = C * H
-	F = A * B
-	B = math.Cos(M)
-	G = P - A
-	J = G - I
-	O = D * E
-	B = math.Min(C, C)
-	J = J + N
-	E = B + C
-	A = E * B
-	P = math.Cos(O)
-	E = math.Sin(P)
-	N = E + F
-	F = O - N
-	J = J + N
-	J = J + N
-	M = L - J
-	P = A - M
+		E = E + A
+		M = math.Sin(D)
+		O = E - D
+		B = math.Cos(N)
+		O = math.Sqrt(A)
+		D = math.Min(D, A)
+		G = float(A < O)
+		A = A - G
+		G = math.Sin(G)
+		I = D * A
+		A = A - G
+		M = I + E
+		G = C * P
+		P = divide(A, G)
+		G = math.Sqrt(M)
+		E = G * P
+		D = E + P
+		K = L * P
+		P = P + D
+		D = math.Min(P, A)
+		P = math.Sin(D)
+		P = P + K
 
-	fmt.Println(P)
+		fmt.Println(P)
+	}
 }

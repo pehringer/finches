@@ -28,6 +28,14 @@ const (
 	shiftMask   = 0x000F
 )
 
+type registers [16]float64
+
+func setupRegisters(constants []float64) *registers {
+	state := registers{}
+	copy(state[:], constants)
+	return &state
+}
+
 func castFloat(b bool) float64 {
 	if b {
 		return 1
@@ -48,53 +56,56 @@ func safeDivision(n, d float64) float64 {
 	return math.Inf(-1)
 }
 
-func executeInstruction(registers *[16]float64, instruction uint16) {
+func (r *registers) executeInstruction(instruction uint16) {
 	second := int(instruction >> secondShift & shiftMask)
 	first := int(instruction >> firstShift & shiftMask)
 	result := int(instruction >> resultShift & shiftMask)
 	opcode := instruction & opcodeMask
 	switch opcode {
 	case opcodeAD:
-		registers[result] = registers[first] + registers[second]
+		r[result] = r[first] + r[second]
 	case opcodeSB:
-		registers[result] = registers[first] - registers[second]
+		r[result] = r[first] - r[second]
 	case opcodeML:
-		registers[result] = registers[first] * registers[second]
+		r[result] = r[first] * r[second]
 	case opcodeDV:
-		registers[result] = safeDivision(registers[first], registers[second])
+		r[result] = safeDivision(r[first], r[second])
 	case opcodePW:
-		registers[result] = math.Pow(registers[first], registers[second])
+		r[result] = math.Pow(r[first], r[second])
 	case opcodeSQ:
-		registers[result] = math.Sqrt(registers[first])
+		r[result] = math.Sqrt(r[first])
 	case opcodeEX:
-		registers[result] = math.Exp(registers[first])
+		r[result] = math.Exp(r[first])
 	case opcodeLG:
-		registers[result] = math.Log(registers[first])
+		r[result] = math.Log(r[first])
 	case opcodeSN:
-		registers[result] = math.Sin(registers[first])
+		r[result] = math.Sin(r[first])
 	case opcodeAS:
-		registers[result] = math.Asin(registers[first])
+		r[result] = math.Asin(r[first])
 	case opcodeCS:
-		registers[result] = math.Cos(registers[first])
+		r[result] = math.Cos(r[first])
 	case opcodeAC:
-		registers[result] = math.Acos(registers[first])
+		r[result] = math.Acos(r[first])
 	case opcodeMN:
-		registers[result] = math.Min(registers[first], registers[second])
+		r[result] = math.Min(r[first], r[second])
 	case opcodeMX:
-		registers[result] = math.Max(registers[first], registers[second])
+		r[result] = math.Max(r[first], r[second])
 	case opcodeLT:
-		registers[result] = castFloat(registers[first] < registers[second])
+		r[result] = castFloat(r[first] < r[second])
 	case opcodeGT:
-		registers[result] = castFloat(registers[first] > registers[second])
+		r[result] = castFloat(r[first] > r[second])
 	}
 }
 
-func simulateProgram(inputs, constants []float64, instructions []uint16) float64 {
-	registers := [16]float64{}
-	copy(registers[:], constants)
-	copy(registers[:], inputs)
+func (r *registers) executeInstructions(inputs []float64, instructions []uint16) {
+	copy(r[:], inputs)
 	for i := range instructions {
-		executeInstruction(&registers, instructions[i])
+		r.executeInstruction(instructions[i])
 	}
-	return registers[15]
+}
+
+func (r *registers) resetRegisters(constants []float64) float64 {
+	output := r[15]
+	copy(r[:], constants)
+	return output
 }
