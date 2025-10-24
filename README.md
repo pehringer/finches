@@ -47,18 +47,10 @@ A **examples.csv** file for a three input function:
 
 The above file contains 16 input-output examples, ideally you want at least 256 examples.
 
-Run finches on **examples.csv**, adjust the **--generations** and or **--individuals** counts if the resulting ```error``` or number of ```instructions``` is too high:
-```
-$ ./finches examples.csv
-instructions: 1 error: 69.621665% -> function.go
-```
-```
-$ ./finches examples.csv --generations 4096
-instructions: 47 error: 6.069102% -> function.go
-```
+Run finches on **examples.csv**, adjust the **--generations** and or **--individuals** counts if the resulting ```function.go``` is not accurate enough:
 ```
 $ ./finches examples.csv --generations 4096 --individuals 1024
-instructions: 20 error: 0.000000% -> function.go
+100.0% -> function.go
 ```
 
 Genetic algorithms at their core rely on randomness so your result may vary.
@@ -67,7 +59,7 @@ Finches will evolve a function to fit the input-output examples and create a **f
 
 Executing **function.go** with the first example from **examples.csv**:
 ```
-go run function.go 2.175702178 3.4978843946 2.8679357454
+$ go run function.go 2.175702178 3.4978843946 2.8679357454
 42.720173532676014
 ```
 
@@ -75,6 +67,38 @@ The filepath for the evolved function can also be changed:
 ```
 $ ./finches examples.csv --destination fooBar.go
 instructions: 29 error: 7.706219% -> fooBar.go
+```
+
+Finches also supports evolving recurrent functions that take in a **sequence** of inputs and produce a **single** output.
+
+Create a **sequence.csv** file where each line contains **ONE to EIGHT example inputs followed by ONE OPTIONAL expected output that terminates the sequence**.
+
+A **sequence.csv** file for a one input summation function:
+```
+3,
+10,
+18,
+4,
+20, 55
+17,
+17, 34
+4,
+15,
+7,
+2,
+16,
+12,
+1,
+2,
+3, 62
+```
+
+Running finches on **sequence.csv** and executing **function.go** with the last example sequence from **sequence.csv**:
+```
+$ ./finches sequence.csv --individuals 8192 --generations 1024
+100.0% -> function.go
+$ go run function.go 4 15 7 2 16 12 1 2 3
+62
 ```
 
 # Finches Instruction Set Architecture (ISA)
