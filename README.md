@@ -66,7 +66,7 @@ $ go run function.go 2.175702178 3.4978843946 2.8679357454
 The filepath for the evolved function can also be changed:
 ```
 $ ./finches examples.csv --destination fooBar.go
-instructions: 29 error: 7.706219% -> fooBar.go
+100.0% -> fooBar.go
 ```
 
 Finches also supports evolving recurrent functions that take in a **sequence** of inputs and produce a **single** output.
