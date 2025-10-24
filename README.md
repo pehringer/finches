@@ -93,7 +93,7 @@ A **sequence.csv** file for a one input summation function:
 3, 62
 ```
 
-Running finches on **sequence.csv** and executing **function.go** with the last example sequence from **sequence.csv**:
+Running finches on **sequence.csv** and executing the resulting **function.go** with the last example sequence from **sequence.csv**:
 ```
 $ ./finches sequence.csv --individuals 8192 --generations 1024
 100.0% -> function.go
