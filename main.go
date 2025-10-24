@@ -19,10 +19,9 @@ command options:
 	-i / --individuals  [NUMBER_GREATER_THAN_THREE]
 hints:
 	adjust the --generations and or --individuals counts
-	if the resulting 'error' or number of 'instructions'
-	is too high
+	if the resulting function is not accurate enough.
 
-	each line in the example.csv file must contains ONE to
+	each line in the example.csv file must contain ONE to
 	EIGHT example inputs followed by ONE expected output,
 	for example abs.csv:
 		-0.1,0.1
@@ -30,6 +29,19 @@ hints:
 		4.5,4.5
 		-6.7,6.7
 		-8.9,8.9
+
+	sequences are also supported, each line in the
+	sequence.csv file must contain ONE to EIGHT example
+	inputs followed by ONE OPTIONAL expected output that
+	terminates the sequence, for example sum.csv:
+		18,
+		14,
+		17,
+		1, 50
+		12,
+		9, 21
+		6,
+		15, 21
 `
 
 func exitHelp(err error) {
