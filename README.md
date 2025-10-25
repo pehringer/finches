@@ -69,11 +69,11 @@ $ ./finches examples.csv --destination fooBar.go
 100.0% -> fooBar.go
 ```
 
-Finches also supports evolving recurrent functions that take in a **sequence** of inputs and produce a **single** output.
+Finches also supports evolving functions that take in a **sequence** of inputs and produce a **single** output.
 
-Create a **sequence.csv** file where each line contains **ONE to EIGHT example inputs followed by ONE OPTIONAL expected output that terminates the sequence**.
+Create a **sequences.csv** file where each line contains **ONE to EIGHT example inputs followed by ONE OPTIONAL expected output that terminates the sequence**.
 
-A **sequence.csv** file for a one input summation function:
+A **sequences.csv** file for a one input summation function:
 ```
 3,
 10,
@@ -93,9 +93,9 @@ A **sequence.csv** file for a one input summation function:
 3, 62
 ```
 
-Running finches on **sequence.csv** and executing the resulting **function.go** with the last example sequence from **sequence.csv**:
+Running finches on **sequences.csv** and executing the resulting **function.go** with the last example sequence from **sequences.csv**:
 ```
-$ ./finches sequence.csv --individuals 8192 --generations 1024
+$ ./finches sequences.csv --individuals 8192 --generations 1024
 100.0% -> function.go
 $ go run function.go 4 15 7 2 16 12 1 2 3
 62
