@@ -110,7 +110,7 @@ func main() {
 	}
 	inputs, outputs, err := readExamples(source)
 	if err != nil {
-		exitError(err)
+		exitHelp(err)
 	}
 	constants, instructions := evolve(generations, individuals, inputs, outputs)
 	fmt.Printf(" -> %s\n", destination)
