@@ -47,11 +47,17 @@ A **examples.csv** file for a three input function:
 
 The above file contains 16 input-output examples, ideally you want at least 256 examples.
 
-Run finches on **examples.csv**, adjust the **--generations** and or **--individuals** counts if the resulting ```function.go``` is not accurate enough:
+Run finches on **examples.csv**, adjust the **--population** count if the resulting ```function.go``` is not accurate enough:
 ```
-$ ./finches examples.csv --generations 4096 --individuals 1024
-100.0% -> function.go
+$ ./finches examples.csv --population 1024
+function.go 2.309575% 2026-05-23 22:22:04.221220104 -0600 MDT m=+0.009410017
+function.go 27.464335% 2026-05-23 22:22:04.221384894 -0600 MDT m=+0.009574807
+...
+function.go 98.300327% 2026-05-23 22:23:52.183611992 -0600 MDT m=+107.971801895
+function.go 98.300486% 2026-05-23 22:23:52.205261752 -0600 MDT m=+107.993451665
+^C
 ```
+**The above run achieved an accuracy of 98.300486% before it was stopped.**
 
 Genetic algorithms at their core rely on randomness so your result may vary.
 
@@ -60,13 +66,15 @@ Finches will evolve a function to fit the input-output examples and create a **f
 Executing **function.go** with the first example from **examples.csv**:
 ```
 $ go run function.go 2.175702178 3.4978843946 2.8679357454
-42.720173532676014
+41.72218989361563
 ```
 
 The filepath for the evolved function can also be changed:
 ```
 $ ./finches examples.csv --destination fooBar.go
-100.0% -> fooBar.go
+fooBar.go 3.513576% 2026-05-23 22:22:04.221220104 -0600 MDT m=+0.009410017
+fooBar.go 22.956332% 2026-05-23 22:22:04.221384894 -0600 MDT m=+0.009574807
+...
 ```
 
 Finches also supports evolving functions that take in a **sequence** of inputs and produce a **single** output.
@@ -95,8 +103,13 @@ A **sequences.csv** file for a one input summation function:
 
 Running finches on **sequences.csv** and executing the resulting **function.go** with the last example sequence from **sequences.csv**:
 ```
-$ ./finches sequences.csv --individuals 8192 --generations 1024
-100.0% -> function.go
+$ ./finches sequences.csv --population 8192
+function.go 48.169398% 2026-05-23 22:29:11.065021621 -0600 MDT m=+0.010602057
+function.go 63.885901% 2026-05-23 22:29:11.065144271 -0600 MDT m=+0.010724717
+...
+function.go 97.996169% 2026-05-23 22:29:26.987170778 -0600 MDT m=+15.932751224
+function.go 100.000000% 2026-05-23 22:29:27.11045405 -0600 MDT m=+16.056034506
+^C
 $ go run function.go 4 15 7 2 16 12 1 2 3
 62
 ```
@@ -169,11 +182,10 @@ Additionally, the **selection and replacement operators are designed to slow dow
   + **Selection:** Two neighboring parents are randomly selected from the population. A separate donor individual is also randomly selected from the population.
   + **Replacement:** The parent with the lower fitness score (or if equal, the one with a higher instruction count) is selected to be the new offspring.
   + **Fission:** The offspring's instructions and constants are replaced with a copy of the remaining parent's instructions and constants.
+  + **Transfer:** With a small probability, a small random block of instructions from the donor is copied and randomly inserted into the offspring.
   + **Mutation:** The offspring then undergoes one of the following mutations:
     * A constant is randomly adjusted slightly.
     * An instruction is randomly replaced (with a new random one).
     * An instruction is randomly deleted.
     * An instruction is randomly inserted (with a new random one).
-  + **Transfer:** With a small probability, a small random block of instructions from the donor is copied and randomly inserted into the offspring.
   + **Evaluation:** The offspring's fitness score is calculated by running a series of test cases. NaN or Infinity results are heavily penalized.
-- **Termination:** The constants and instructions from the individual with the highest fitness score are returned.

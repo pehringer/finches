@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 	"sync"
@@ -14,11 +13,11 @@ type individual struct {
 	instructions []uint16
 }
 
-func initialize(individuals int) []individual {
-	population := make([]individual, individuals)
-	for i := range individuals {
-		population[i].fitness = math.MaxFloat64
-		population[i].constants = []float64{
+func initialize(population int) []individual {
+	individuals := make([]individual, population)
+	for i := range population {
+		individuals[i].fitness = math.MaxFloat64
+		individuals[i].constants = []float64{
 			rand.Float64()*200.0 - 100.0,
 			rand.Float64()*200.0 - 100.0,
 			rand.Float64()*200.0 - 100.0,
@@ -36,21 +35,21 @@ func initialize(individuals int) []individual {
 			rand.Float64()*200.0 - 100.0,
 			rand.Float64()*200.0 - 100.0,
 		}
-		population[i].instructions = []uint16{
+		individuals[i].instructions = []uint16{
 			uint16(rand.Int()),
 		}
 	}
-	return population
+	return individuals
 }
 
-func seleCt(population []individual) (*individual, *individual, *individual) {
-	i := rand.Intn(len(population))
-	j := (i + 1) % len(population)
-	k := rand.Intn(len(population))
+func seleCt(individuals []individual) (*individual, *individual, *individual) {
+	i := rand.Intn(len(individuals))
+	j := (i + 1) % len(individuals)
+	k := rand.Intn(len(individuals))
 	for k == i || k == j {
-		k = rand.Intn(len(population))
+		k = rand.Intn(len(individuals))
 	}
-	return &population[i], &population[j], &population[k]
+	return &individuals[i], &individuals[j], &individuals[k]
 }
 
 func replace(parentX, parentY *individual) (*individual, *individual) {
@@ -112,7 +111,7 @@ func transfer(donor, offspring *individual) *individual {
 	return offspring
 }
 
-func evaluate(inputs [][]float64, outputs [][]*float64, penalty float64, offspring *individual) {
+func evaluate(inputs [][]float64, outputs [][]*float64, penalty float64, offspring *individual) *individual {
 	offspring.fitness = 0
 	machine := setupRegisters(offspring.constants)
 	for i := range min(len(inputs), len(outputs)) {
@@ -127,19 +126,10 @@ func evaluate(inputs [][]float64, outputs [][]*float64, penalty float64, offspri
 		}
 		offspring.fitness += delta
 	}
+	return offspring
 }
 
-func terminate(population []individual) *individual {
-	alpha := &population[0]
-	for i := range population {
-		if population[i].fitness < alpha.fitness {
-			alpha = &population[i]
-		}
-	}
-	return alpha
-}
-
-func evolve(generations, individuals int, inputs [][]float64, outputs [][]*float64) ([]float64, []uint16) {
+func evolve(population int, inputs [][]float64, outputs [][]*float64, fitness chan<- float64, constants chan<- []float64, instructions chan<- []uint16) {
 	total := 0.0
 	for i := range outputs {
 		for j := range outputs[i] {
@@ -148,27 +138,32 @@ func evolve(generations, individuals int, inputs [][]float64, outputs [][]*float
 			}
 		}
 	}
-	population := initialize(individuals)
-	for i := range generations {
-		wg := sync.WaitGroup{}
-		for range individuals {
-			parentX, parentY, donor := seleCt(population)
-			parentX.mu.Lock()
-			parentY.mu.Lock()
-			donor.mu.Lock()
-			wg.Add(1)
-			go func(parentX, parentY, donor *individual) {
-				defer parentX.mu.Unlock()
-				defer parentY.mu.Unlock()
-				defer donor.mu.Unlock()
-				defer wg.Done()
-				evaluate(inputs, outputs, total, transfer(donor, mutate(fission(replace(parentX, parentY)))))
-			}(parentX, parentY, donor)
-		}
-		wg.Wait()
-		fmt.Printf("\r%.2f%%", float64(i)/float64(generations)*100)
+	lowest := total
+	individuals := initialize(population)
+	for {
+		parentX, parentY, donor := seleCt(individuals)
+		parentX.mu.Lock()
+		parentY.mu.Lock()
+		donor.mu.Lock()
+		go func(parentX, parentY, donor *individual) {
+			parent, offspring := replace(parentX, parentY)
+			fission(parent, offspring)
+			parent.mu.Unlock()
+			transfer(donor, offspring)
+			donor.mu.Unlock()
+			mutate(offspring)
+			evaluate(inputs, outputs, total, offspring)
+			if offspring.fitness < lowest {
+				lowest = offspring.fitness
+				fitness <- 100 - offspring.fitness / total * 100
+				floats := make([]float64, len(offspring.constants))
+				copy(floats, offspring.constants)
+				constants <- floats
+				uints := make([]uint16, len(offspring.instructions))
+				copy(uints, offspring.instructions)
+				instructions <- uints
+			}
+			offspring.mu.Unlock()
+		}(parentX, parentY, donor)
 	}
-	fmt.Printf("\r100.0%%")
-	alpha := terminate(population)
-	return alpha.constants, alpha.instructions
 }

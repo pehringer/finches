@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 )
 
 const help = `
@@ -14,12 +15,11 @@ const help = `
 command format:
 	finches [EXAMPLES_CSV_FILEPATH] [OPTION] . . .
 command options:
-	-d / --destination  [FILEPATH]
-	-g / --generations  [NUMBER_GREATER_THAN_ZERO]
-	-i / --individuals  [NUMBER_GREATER_THAN_THREE]
+	-d / --destination [FILEPATH]
+	-p / --population  [NUMBER_GREATER_THAN_THREE]
 hints:
-	adjust the --generations and or --individuals counts
-	if the resulting function is not accurate enough.
+	adjust the --population count if the resulting
+	function is not accurate enough.
 
 	each line in the example.csv file must contain ONE to
 	EIGHT example inputs followed by ONE expected output,
@@ -80,30 +80,21 @@ func main() {
 		exitHelp(nil)
 	}
 	destination := "function.go"
-	generations := 2048
-	individuals := 512
+	population := 512
 	for i := 2; i < len(os.Args); i += 2 {
 		switch os.Args[i] {
 		case "-d":
 			fallthrough
 		case "--destination":
 			destination = os.Args[i+1]
-		case "-g":
+		case "-p":
 			fallthrough
-		case "--generations":
-			number, err := parseMinimum(os.Args[i+1], 1)
-			if err != nil {
-				exitHelp(fmt.Errorf("-g / --generations %w", err))
-			}
-			generations = number
-		case "-i":
-			fallthrough
-		case "--individuals":
+		case "--population":
 			number, err := parseMinimum(os.Args[i+1], 3)
 			if err != nil {
-				exitHelp(fmt.Errorf("-i / --individuals %w", err))
+				exitHelp(fmt.Errorf("-p / --population %w", err))
 			}
-			individuals = number
+			population = number
 		default:
 			exitHelp(fmt.Errorf("'%s' unknown option", os.Args[i]))
 		}
@@ -112,10 +103,15 @@ func main() {
 	if err != nil {
 		exitHelp(err)
 	}
-	constants, instructions := evolve(generations, individuals, inputs, outputs)
-	fmt.Printf(" -> %s\n", destination)
-	err = writeProgram(destination, len(inputs[0]), constants, instructions)
-	if err != nil {
-		exitError(err)
+	fitness := make(chan float64, 1)
+	constants := make(chan []float64, 1)
+	instructions := make(chan []uint16, 1)
+	go evolve(population, inputs, outputs, fitness, constants, instructions)
+	for {
+		err = writeProgram(destination, len(inputs[0]), <- constants, <- instructions)
+		if err != nil {
+			exitError(err)
+		}
+		fmt.Printf("%s %f%% %v\n", destination, <- fitness, time.Now())
 	}
 }
