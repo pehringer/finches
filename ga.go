@@ -6,11 +6,15 @@ import (
 	"sync"
 )
 
-type individual struct {
-	mu           sync.Mutex
+type solution struct {
 	fitness      float64
 	constants    []float64
 	instructions []uint16
+}
+
+type individual struct {
+	mu sync.Mutex
+	solution
 }
 
 func initialize(population int) []individual {
@@ -129,7 +133,7 @@ func evaluate(inputs [][]float64, outputs [][]*float64, penalty float64, offspri
 	return offspring
 }
 
-func evolve(population int, inputs [][]float64, outputs [][]*float64, fitness chan<- float64, constants chan<- []float64, instructions chan<- []uint16) {
+func evolve(population int, inputs [][]float64, outputs [][]*float64, solutions chan<- solution) {
 	total := 0.0
 	for i := range outputs {
 		for j := range outputs[i] {
@@ -138,6 +142,7 @@ func evolve(population int, inputs [][]float64, outputs [][]*float64, fitness ch
 			}
 		}
 	}
+	mu := sync.Mutex{}
 	lowest := total
 	individuals := initialize(population)
 	for {
@@ -153,16 +158,16 @@ func evolve(population int, inputs [][]float64, outputs [][]*float64, fitness ch
 			donor.mu.Unlock()
 			mutate(offspring)
 			evaluate(inputs, outputs, total, offspring)
+			mu.Lock()
 			if offspring.fitness < lowest {
 				lowest = offspring.fitness
-				fitness <- 100 - offspring.fitness / total * 100
-				floats := make([]float64, len(offspring.constants))
-				copy(floats, offspring.constants)
-				constants <- floats
-				uints := make([]uint16, len(offspring.instructions))
-				copy(uints, offspring.instructions)
-				instructions <- uints
+				solutions <- solution{
+					fitness:      100 - offspring.fitness / total * 100,
+					constants:    append([]float64{}, offspring.constants...),
+					instructions: append([]uint16{}, offspring.instructions...),
+				}
 			}
+			mu.Unlock()
 			offspring.mu.Unlock()
 		}(parentX, parentY, donor)
 	}

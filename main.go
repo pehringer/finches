@@ -103,15 +103,14 @@ func main() {
 	if err != nil {
 		exitHelp(err)
 	}
-	fitness := make(chan float64, 1)
-	constants := make(chan []float64, 1)
-	instructions := make(chan []uint16, 1)
-	go evolve(population, inputs, outputs, fitness, constants, instructions)
+	solutions := make(chan solution)
+	go evolve(population, inputs, outputs, solutions)
 	for {
-		err = writeProgram(destination, len(inputs[0]), <- constants, <- instructions)
+		solution := <- solutions
+		err = writeProgram(destination, len(inputs[0]), solution.constants, solution.instructions)
 		if err != nil {
 			exitError(err)
 		}
-		fmt.Printf("%s %f%% %v\n", destination, <- fitness, time.Now())
+		fmt.Printf("%s %f%% %v\n", destination, solution.fitness, time.Now())
 	}
 }
