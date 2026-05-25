@@ -71,8 +71,7 @@ func replace(parentX, parentY *individual) (*individual, *individual) {
 
 func fission(parent, offspring *individual) *individual {
 	copy(offspring.constants, parent.constants)
-	offspring.instructions = make([]uint16, len(parent.instructions))
-	copy(offspring.instructions, parent.instructions)
+	offspring.instructions = append([]uint16(nil), parent.instructions...)
 	return offspring
 }
 
@@ -163,8 +162,8 @@ func evolve(population int, inputs [][]float64, outputs [][]*float64, solutions 
 				lowest = offspring.fitness
 				solutions <- solution{
 					fitness:      100 - offspring.fitness / total * 100,
-					constants:    append([]float64{}, offspring.constants...),
-					instructions: append([]uint16{}, offspring.instructions...),
+					constants:    append([]float64(nil), offspring.constants...),
+					instructions: append([]uint16(nil), offspring.instructions...),
 				}
 			}
 			mu.Unlock()
