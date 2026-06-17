@@ -16,7 +16,7 @@ command format:
 	finches [EXAMPLES_CSV_FILEPATH] [OPTION] . . .
 command options:
 	-d / --destination [FILEPATH]
-	-p / --population  [NUMBER_GREATER_THAN_THREE]
+	-p / --population  [NUMBER_AT_LEAST_THREE]
 hints:
 	adjust the --population count if the resulting
 	function is not accurate enough.
