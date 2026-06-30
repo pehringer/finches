@@ -30,7 +30,7 @@ const (
 
 type registers [16]float64
 
-func setupRegisters(constants []float64) *registers {
+func setup(constants []float64) *registers {
 	state := registers{}
 	copy(state[:], constants)
 	return &state
@@ -56,7 +56,7 @@ func safeDivision(n, d float64) float64 {
 	return math.Inf(-1)
 }
 
-func (r *registers) executeInstruction(instruction uint16) {
+func (r *registers) execute(instruction uint16) {
 	second := int(instruction >> secondShift & shiftMask)
 	first := int(instruction >> firstShift & shiftMask)
 	result := int(instruction >> resultShift & shiftMask)
@@ -97,14 +97,14 @@ func (r *registers) executeInstruction(instruction uint16) {
 	}
 }
 
-func (r *registers) executeInstructions(inputs []float64, instructions []uint16) {
+func (r *registers) process(inputs []float64, instructions []uint16) {
 	copy(r[:], inputs)
 	for i := range instructions {
-		r.executeInstruction(instructions[i])
+		r.execute(instructions[i])
 	}
 }
 
-func (r *registers) resetRegisters(constants []float64) float64 {
+func (r *registers) reset(constants []float64) float64 {
 	output := r[15]
 	copy(r[:], constants)
 	return output

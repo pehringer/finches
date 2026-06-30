@@ -113,13 +113,13 @@ func (i *individual) mutate() {
 
 func (i *individual) evaluate(inputs [][]float64, outputs []float64, penalty float64) {
 	i.fitness = 0
-	machine := setupRegisters(i.constants)
+	machine := setup(i.constants)
 	for s := range min(len(inputs), len(outputs)) {
-		machine.executeInstructions(inputs[s], i.instructions)
+		machine.process(inputs[s], i.instructions)
 		if math.IsNaN(outputs[s]) {
 			continue
 		}
-		output := machine.resetRegisters(i.constants)
+		output := machine.reset(i.constants)
 		delta := math.Abs(output - outputs[s])
 		if math.IsNaN(delta) || math.IsInf(delta, 0) {
 			delta = penalty
