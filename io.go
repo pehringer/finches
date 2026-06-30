@@ -45,7 +45,6 @@ func read(filename string) ([][]float64, []float64, error) {
 	if len(values[0]) > 9 {
 		return nil, nil, fmt.Errorf("csv format: too many example input columns (maximum first eight columns)")
 	}
-	index := len(values[0]) - 1
 	inputs := make([][]float64, len(values))
 	outputs := make([]float64, len(values))
 	for i := range len(values) {
@@ -53,7 +52,7 @@ func read(filename string) ([][]float64, []float64, error) {
 		if err != nil {
 			return nil, nil, fmt.Errorf("row %d: %w", i+1, err)
 		}
-		index = len(inouts) - 1
+		index := len(inouts) - 1
 		inputs[i] = inouts[:index]
 		outputs[i] = inouts[index]
 	}
