@@ -74,6 +74,18 @@ func (i *individual) fission(offspring *individual) {
 	offspring.instructions = append([]uint16(nil), i.instructions...)
 }
 
+func (i *individual) transfer(offspring *individual) {
+	if rand.Intn(100) == 0 {
+		n := rand.Intn(min(len(i.instructions), 10)) + 1
+		t := rand.Intn(len(i.instructions) + 1 - n)
+		body := i.instructions[t:t+n]
+		o := rand.Intn(len(offspring.instructions) + 1)
+		head := offspring.instructions[:o]
+		tail := offspring.instructions[o:]
+		offspring.instructions = append(head, append(body, tail...)...)
+	}
+}
+
 func (i *individual) mutate() {
 	switch rand.Intn(4) {
 	case 0:
@@ -99,28 +111,16 @@ func (i *individual) mutate() {
 	}
 }
 
-func (i *individual) transfer(offspring *individual) {
-	if rand.Intn(100) == 0 {
-		n := rand.Intn(min(len(i.instructions), 10)) + 1
-		t := rand.Intn(len(i.instructions) + 1 - n)
-		body := i.instructions[t:t+n]
-		o := rand.Intn(len(offspring.instructions) + 1)
-		head := offspring.instructions[:o]
-		tail := offspring.instructions[o:]
-		offspring.instructions = append(head, append(body, tail...)...)
-	}
-}
-
-func (i *individual) evaluate(inputs [][]float64, outputs [][]*float64, penalty float64) {
+func (i *individual) evaluate(inputs [][]float64, outputs []float64, penalty float64) {
 	i.fitness = 0
 	machine := setupRegisters(i.constants)
 	for s := range min(len(inputs), len(outputs)) {
 		machine.executeInstructions(inputs[s], i.instructions)
-		if len(outputs[s]) < 1 || outputs[s][0] == nil {
+		if math.IsNaN(outputs[s]) {
 			continue
 		}
 		output := machine.resetRegisters(i.constants)
-		delta := math.Abs(output - *outputs[s][0])
+		delta := math.Abs(output - outputs[s])
 		if math.IsNaN(delta) || math.IsInf(delta, 0) {
 			delta = penalty
 		}
@@ -128,14 +128,13 @@ func (i *individual) evaluate(inputs [][]float64, outputs [][]*float64, penalty 
 	}
 }
 
-func evolve(population int, inputs [][]float64, outputs [][]*float64, solutions chan<- solution) {
+func evolve(population int, inputs [][]float64, outputs []float64, solutions chan<- solution) {
 	total := 0.0
 	for i := range outputs {
-		for j := range outputs[i] {
-			if outputs[i][j] != nil {
-				total += math.Abs(*outputs[i][j])
-			}
+		if math.IsNaN(outputs[i]) {
+			continue
 		}
+		total += math.Abs(outputs[i])
 	}
 	mu := sync.Mutex{}
 	lowest := total

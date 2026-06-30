@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -8,12 +9,13 @@ import (
 	"strings"
 )
 
-func parseInputs(values []string) ([]float64, error) {
+func parse(values []string) ([]float64, error) {
 	result := make([]float64, len(values))
 	for i := range values {
+		result[i] = math.NaN()
 		trimmed := strings.TrimSpace(values[i])
 		if trimmed == "" {
-			return nil, fmt.Errorf("column %d: do data", i+1)
+			continue
 		}
 		float, err := strconv.ParseFloat(trimmed, 64)
 		if err != nil {
@@ -24,23 +26,7 @@ func parseInputs(values []string) ([]float64, error) {
 	return result, nil
 }
 
-func parseOutputs(values []string) ([]*float64, error) {
-	result := make([]*float64, len(values))
-	for i := range values {
-		trimmed := strings.TrimSpace(values[i])
-		if trimmed == "" {
-			continue
-		}
-		float, err := strconv.ParseFloat(trimmed, 64)
-		if err != nil {
-			return nil, fmt.Errorf("column %d: %w", i+1, err)
-		}
-		result[i] = &float
-	}
-	return result, nil
-}
-
-func readExamples(filename string) ([][]float64, [][]*float64, error) {
+func read(filename string) ([][]float64, []float64, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not open file: %w", err)
@@ -61,16 +47,15 @@ func readExamples(filename string) ([][]float64, [][]*float64, error) {
 	}
 	index := len(values[0]) - 1
 	inputs := make([][]float64, len(values))
-	outputs := make([][]*float64, len(values))
+	outputs := make([]float64, len(values))
 	for i := range len(values) {
-		inputs[i], err = parseInputs(values[i][:index])
+		inouts, err := parse(values[i])
 		if err != nil {
 			return nil, nil, fmt.Errorf("row %d: %w", i+1, err)
 		}
-		outputs[i], err = parseOutputs(values[i][index:])
-		if err != nil {
-			return nil, nil, fmt.Errorf("row %d: %w", i+1, err)
-		}
+		index = len(inouts) - 1
+		inputs[i] = inouts[:index]
+		outputs[i] = inouts[index]
 	}
 	return inputs, outputs, nil
 }
@@ -169,7 +154,7 @@ func main() {
 	fmt.Println(P)
 }`
 
-func writeProgram(path string, inputs int, constants []float64, instructions []uint16) error {
+func write(path string, inputs int, constants []float64, instructions []uint16) error {
 	variables := ""
 	for i := range constants {
 		name := registerVariable[i]

@@ -99,7 +99,7 @@ func main() {
 			exitHelp(fmt.Errorf("'%s' unknown option", os.Args[i]))
 		}
 	}
-	inputs, outputs, err := readExamples(source)
+	inputs, outputs, err := read(source)
 	if err != nil {
 		exitHelp(err)
 	}
@@ -107,7 +107,7 @@ func main() {
 	go evolve(population, inputs, outputs, solutions)
 	for {
 		solution := <- solutions
-		err = writeProgram(destination, len(inputs[0]), solution.constants, solution.instructions)
+		err = write(destination, len(inputs[0]), solution.constants, solution.instructions)
 		if err != nil {
 			exitError(err)
 		}
