@@ -122,7 +122,7 @@ Finches, however, **employs branchless programming techniques for its control fl
 This approach integrates control flow directly into computations.
 By avoiding explicit branching, LGP can incrementally evolve conditional flow logic through symbolic regression, resulting in a significantly smoother solution landscape.
 
-Furthermore, this ISA **only contains arithmetic comparison operations** (such as min, max, <, and >).
+Furthermore, this ISA **only contains smooth continuous functions for selection logic** (such as min, max, and sigmoid).
 This design choice provides a more incremental and continuous path for forming control flow logic when compared to all-or-nothing boolean operations (like AND, OR, NOT), further contributing to a smoother solution landscape.
 
 Finally, the **inclusion of inverse operations** (e.g., addition and subtraction, multiplication and division, sine and arcsine) creates a more uniform and balanced search space.
@@ -145,24 +145,24 @@ This allows for continued program execution instead of program termination.
 **NOTE:** Constants are preloaded into the registers before program execution.
 This eliminates the need for special registers and allows for uniform register access.
 
-|OPCODE|Mnemonic|Pseudocode                                                       |
-|------|--------|-----------------------------------------------------------------|
-|0000  |AD      |register[RESULT] = register[FIRST] + register[SECOND]            |
-|0001  |SB      |register[RESULT] = register[FIRST] - register[SECOND]            |
-|0010  |ML      |register[RESULT] = register[FIRST] * register[SECOND]            |
-|0011  |DV      |register[RESULT] = register[FIRST] / register[SECOND]            |
-|0100  |PW      |register[RESULT] = pow(register[FIRST], register[SECOND])        |
-|0101  |SQ      |register[RESULT] = sqrt(register[FIRST])                         |
-|0110  |EX      |register[RESULT] = exp(register[FIRST])                          |
-|0111  |LG      |register[RESULT] = log(register[FIRST])                          |
-|1000  |SN      |register[RESULT] = sin(register[FIRST])                          |
-|1001  |AS      |register[RESULT] = asin(register[FIRST])                         |
-|1010  |CS      |register[RESULT] = cos(register[FIRST])                          |
-|1011  |AC      |register[RESULT] = acos(register[FIRST])                         |
-|1100  |MN      |register[RESULT] = min(register[FIRST], register[SECOND])        |
-|1101  |MX      |register[RESULT] = max(register[FIRST], register[SECOND])        |
-|1110  |LT      |register[RESULT] = 1 if register[FIRST] < register[SECOND] else 0|
-|1111  |GT      |register[RESULT] = 1 if register[FIRST] > register[SECOND] else 0|
+|OPCODE|Mnemonic|Pseudocode                                               |
+|------|--------|---------------------------------------------------------|
+|0000  |AD      |register[RESULT] = register[FIRST] + register[SECOND]    |
+|0001  |SB      |register[RESULT] = register[FIRST] - register[SECOND]    |
+|0010  |ML      |register[RESULT] = register[FIRST] * register[SECOND]    |
+|0011  |DV      |register[RESULT] = register[FIRST] / register[SECOND]    |
+|0100  |MN      |register[RESULT] = min(register[FIRST], register[SECOND])|
+|0101  |MX      |register[RESULT] = max(register[FIRST], register[SECOND])|
+|0110  |PW      |register[RESULT] = pow(register[FIRST], register[SECOND])|
+|0111  |SQ      |register[RESULT] = sqrt(register[FIRST])                 |
+|1000  |EX      |register[RESULT] = exp(register[FIRST])                  |
+|1001  |LG      |register[RESULT] = log(register[FIRST])                  |
+|1010  |SN      |register[RESULT] = sin(register[FIRST])                  |
+|1011  |AS      |register[RESULT] = asin(register[FIRST])                 |
+|1100  |CS      |register[RESULT] = cos(register[FIRST])                  |
+|1101  |AC      |register[RESULT] = acos(register[FIRST])                 |
+|1110  |SG      |register[RESULT] = sigmoid(register[FIRST])              |
+|1111  |LT      |register[RESULT] = logit(register[FIRST])                |
 
 # Finches Genetic Algorithm (GA)
 
@@ -180,7 +180,7 @@ Additionally, the **selection and replacement operators are designed to slow dow
 - **Initialization:** Create a population of individuals. Each individual contains a very low fitness score, multiple (sixteen) random constants, and a single random instruction.
 - **Loop:**
   + **Selection:** Two neighboring parents are randomly selected from the population. A separate donor individual is also randomly selected from the population.
-  + **Replacement:** The parent with the lower fitness score (or if equal, the one with a higher instruction count) is selected to be the new offspring.
+  + **Replacement:** The parent with the lower fitness score (or if approximately equal, the one with a higher instruction count) is selected to be the new offspring.
   + **Fission:** The offspring's instructions and constants are replaced with a copy of the remaining parent's instructions and constants.
   + **Transfer:** With a small probability, a small random block of instructions from the donor is copied and randomly inserted into the offspring.
   + **Mutation:** The offspring then undergoes one of the following mutations:

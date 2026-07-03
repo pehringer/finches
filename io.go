@@ -67,24 +67,12 @@ import "fmt"
 import "math"
 import "strconv"
 
-func float(b bool) float64 {
-  if b {
-    return 1
-  }
-  return 0
+func sigmoid(x float64) float64 {
+  return 1.0 / (1.0 + math.Exp(-x))
 }
 
-func divide(n, d float64) float64 {
-  if math.Abs(d) > 1e-9 {
-    return n / d
-  }
-  if math.Abs(n) < 1e-9 {
-    return math.NaN()
-  }
-  if n > 0 {
-    return math.Inf(1)
-  }
-  return math.Inf(-1)
+func logit(x float64) float64 {
+  return math.Log(x / (1 - x))
 }
 
 var r = [16]float64{
@@ -129,7 +117,11 @@ func write(path string, inputs int, constants []float64, instructions []uint16) 
 		case opcodeML:
 			code += fmt.Sprintf("    %s = %s * %s\n", result, first, second)
 		case opcodeDV:
-			code += fmt.Sprintf("    %s = divide(%s, %s)\n", result, first, second)
+			code += fmt.Sprintf("    %s = %s / %s\n", result, first, second)
+		case opcodeMN:
+			code += fmt.Sprintf("    %s = math.Min(%s, %s)\n", result, first, second)
+		case opcodeMX:
+			code += fmt.Sprintf("    %s = math.Max(%s, %s)\n", result, first, second)
 		case opcodePW:
 			code += fmt.Sprintf("    %s = math.Pow(%s, %s)\n", result, first, second)
 		case opcodeSQ:
@@ -146,14 +138,10 @@ func write(path string, inputs int, constants []float64, instructions []uint16) 
 			code += fmt.Sprintf("    %s = math.Cos(%s)\n", result, first)
 		case opcodeAC:
 			code += fmt.Sprintf("    %s = math.Acos(%s)\n", result, first)
-		case opcodeMN:
-			code += fmt.Sprintf("    %s = math.Min(%s, %s)\n", result, first, second)
-		case opcodeMX:
-			code += fmt.Sprintf("    %s = math.Max(%s, %s)\n", result, first, second)
+		case opcodeSG:
+			code += fmt.Sprintf("    %s = sigmoid(%s)\n", result, first)
 		case opcodeLT:
-			code += fmt.Sprintf("    %s = float(%s < %s)\n", result, first, second)
-		case opcodeGT:
-			code += fmt.Sprintf("    %s = float(%s > %s)\n", result, first, second)
+			code += fmt.Sprintf("    %s = logit(%s)\n", result, first)
 		}
 	}
 	program := fmt.Sprintf(programFormat,

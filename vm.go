@@ -10,18 +10,18 @@ const (
 	opcodeSB    = 0x1000
 	opcodeML    = 0x2000
 	opcodeDV    = 0x3000
-	opcodePW    = 0x4000
-	opcodeSQ    = 0x5000
-	opcodeEX    = 0x6000
-	opcodeLG    = 0x7000
-	opcodeSN    = 0x8000
-	opcodeAS    = 0x9000
-	opcodeCS    = 0xA000
-	opcodeAC    = 0xB000
-	opcodeMN    = 0xC000
-	opcodeMX    = 0xD000
-	opcodeLT    = 0xE000
-	opcodeGT    = 0xF000
+	opcodeMN    = 0x4000
+	opcodeMX    = 0x5000
+	opcodePW    = 0x6000
+	opcodeSQ    = 0x7000
+	opcodeEX    = 0x8000
+	opcodeLG    = 0x9000
+	opcodeSN    = 0xA000
+	opcodeAS    = 0xB000
+	opcodeCS    = 0xC000
+	opcodeAC    = 0xD000
+	opcodeSG    = 0xE000
+	opcodeLT    = 0xF000
 	resultShift = 8
 	firstShift  = 4
 	secondShift = 0
@@ -36,24 +36,12 @@ func setup(constants []float64) *registers {
 	return &state
 }
 
-func castFloat(b bool) float64 {
-	if b {
-		return 1
-	}
-	return 0
+func sigmoid(x float64) float64 {
+	return 1.0 / (1.0 + math.Exp(-x))
 }
 
-func safeDivision(n, d float64) float64 {
-	if math.Abs(d) > 1e-9 {
-		return n / d
-	}
-	if math.Abs(n) < 1e-9 {
-		return math.NaN()
-	}
-	if n > 0 {
-		return math.Inf(1)
-	}
-	return math.Inf(-1)
+func logit(x float64) float64 {
+	return math.Log(x / (1 - x))
 }
 
 func (r *registers) execute(instruction uint16) {
@@ -69,7 +57,11 @@ func (r *registers) execute(instruction uint16) {
 	case opcodeML:
 		r[result] = r[first] * r[second]
 	case opcodeDV:
-		r[result] = safeDivision(r[first], r[second])
+		r[result] = r[first] / r[second]
+	case opcodeMN:
+		r[result] = math.Min(r[first], r[second])
+	case opcodeMX:
+		r[result] = math.Max(r[first], r[second])
 	case opcodePW:
 		r[result] = math.Pow(r[first], r[second])
 	case opcodeSQ:
@@ -86,14 +78,10 @@ func (r *registers) execute(instruction uint16) {
 		r[result] = math.Cos(r[first])
 	case opcodeAC:
 		r[result] = math.Acos(r[first])
-	case opcodeMN:
-		r[result] = math.Min(r[first], r[second])
-	case opcodeMX:
-		r[result] = math.Max(r[first], r[second])
+	case opcodeSG:
+		r[result] = sigmoid(r[first])
 	case opcodeLT:
-		r[result] = castFloat(r[first] < r[second])
-	case opcodeGT:
-		r[result] = castFloat(r[first] > r[second])
+		r[result] = logit(r[first])
 	}
 }
 

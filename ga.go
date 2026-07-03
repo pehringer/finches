@@ -57,16 +57,16 @@ func seleCt(individuals []individual) (*individual, *individual, *individual) {
 }
 
 func replace(parentX, parentY *individual) (*individual, *individual) {
-	if parentX.fitness < parentY.fitness {
-		return parentX, parentY
-	}
-	if parentY.fitness < parentX.fitness {
+	if parentX.fitness - parentY.fitness > 0.001 {
 		return parentY, parentX
 	}
-	if len(parentX.instructions) < len(parentY.instructions) {
+	if parentY.fitness - parentX.fitness > 0.001 {
 		return parentX, parentY
 	}
-	return parentY, parentX
+	if len(parentX.instructions) > len(parentY.instructions) {
+		return parentY, parentX
+	}
+	return parentX, parentY
 }
 
 func (i *individual) fission(offspring *individual) {
