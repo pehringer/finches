@@ -122,7 +122,8 @@ func (i *individual) evaluate(inputs [][]float64, outputs []float64, penalty flo
 		output := machine.reset(i.constants)
 		delta := math.Abs(output - outputs[s])
 		if math.IsNaN(delta) || math.IsInf(delta, 0) {
-			delta = penalty
+			i.fitness = math.MaxFloat64
+			break
 		}
 		i.fitness += delta
 	}
