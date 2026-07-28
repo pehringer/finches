@@ -171,7 +171,7 @@ It promotes slow population convergence, encourages depth-first and breadth-firs
 Furthermore, it **minimizes program breakage**, ensuring genetic operations are less disruptive to evolving programs.
 All of these design choices not only contribute to a smoother fitness landscape but also directly enhance performance by simplifying computational overhead.
 
-The major difference in the GA is the **replacement of the traditional crossover operator with the Fission and Transfer operators**.
+The major difference in the GA is the **replacement of the traditional crossover operator with the fission and mutation (insert donor instruction) operators**.
 These two operators simulate horizontal gene transfer resulting minimal breakage and strong global exploration.
 
 Additionally, the **selection and replacement operators are designed to slow down premature convergence** and enable robust local exploration. While their simplicity allows for fast execution and reduced memory allocations.
@@ -182,10 +182,10 @@ Additionally, the **selection and replacement operators are designed to slow dow
   + **Selection:** Two neighboring parents are randomly selected from the population. A separate donor individual is also randomly selected from the population.
   + **Replacement:** The parent with the lower fitness score (or if approximately equal, the one with a higher instruction count) is selected to be the new offspring.
   + **Fission:** The offspring's instructions and constants are replaced with a copy of the remaining parent's instructions and constants.
-  + **Transfer:** With a small probability, a small random block of instructions from the donor is copied and randomly inserted into the offspring.
-  + **Mutation:** The offspring then undergoes one of the following mutations:
-    * A constant is randomly adjusted slightly.
-    * An instruction is randomly replaced (with a new random one).
-    * An instruction is randomly deleted.
-    * An instruction is randomly inserted (with a new random one).
+  + **Mutation:** The offspring then undergoes one of the following random mutations:
+    * Adjust constant slightly.
+    * Flip instruction bit. 
+    * Remove instruction.
+    * Insert new instruction.
+    * Insert donor instruction.
   + **Evaluation:** The offspring's fitness score is calculated by running a series of test cases. NaN or Infinity results are heavily penalized.

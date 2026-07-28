@@ -69,31 +69,19 @@ func replace(parentX, parentY *individual) (*individual, *individual) {
 	return parentX, parentY
 }
 
-func (i *individual) fission(offspring *individual) {
-	copy(offspring.constants, i.constants)
-	offspring.instructions = append([]uint16(nil), i.instructions...)
+func (i *individual) fission(parent *individual) {
+	copy(i.constants, parent.constants)
+	i.instructions = append([]uint16(nil), parent.instructions...)
 }
 
-func (i *individual) transfer(offspring *individual) {
-	if rand.Intn(100) == 0 {
-		n := rand.Intn(min(len(i.instructions), 10)) + 1
-		t := rand.Intn(len(i.instructions) + 1 - n)
-		body := i.instructions[t:t+n]
-		o := rand.Intn(len(offspring.instructions) + 1)
-		head := offspring.instructions[:o]
-		tail := offspring.instructions[o:]
-		offspring.instructions = append(head, append(body, tail...)...)
-	}
-}
-
-func (i *individual) mutate() {
-	switch rand.Intn(4) {
+func (i *individual) mutate(donor *individual) {
+	switch rand.Intn(5) {
 	case 0:
 		m := rand.Intn(len(i.constants))
 		i.constants[m] += rand.Float64()*0.002 - 0.001
 	case 1:
 		m := rand.Intn(len(i.instructions))
-		i.instructions[m] = uint16(rand.Int())
+		i.instructions[m] ^= 1 << rand.Intn(64)
 	case 2:
 		if len(i.instructions) <= 1 {
 			break
@@ -103,15 +91,22 @@ func (i *individual) mutate() {
 		tail := i.instructions[m+1:]
 		i.instructions = append(head, tail...)
 	case 3:
+		body := []uint16{uint16(rand.Int())}
 		m := rand.Intn(len(i.instructions))
 		head := i.instructions[:m]
-		body := []uint16{uint16(rand.Int())}
+		tail := i.instructions[m:]
+		i.instructions = append(head, append(body, tail...)...)
+	case 4:
+		n := rand.Intn(len(donor.instructions))
+		body := []uint16{donor.instructions[n]}
+		m := rand.Intn(len(i.instructions))
+		head := i.instructions[:m]
 		tail := i.instructions[m:]
 		i.instructions = append(head, append(body, tail...)...)
 	}
 }
 
-func (i *individual) evaluate(inputs [][]float64, outputs []float64, penalty float64) {
+func (i *individual) evaluate(inputs [][]float64, outputs []float64) {
 	i.fitness = 0
 	machine := setup(i.constants)
 	for s := range min(len(inputs), len(outputs)) {
@@ -147,12 +142,11 @@ func evolve(population int, inputs [][]float64, outputs []float64, solutions cha
 		donor.mu.Lock()
 		go func(parentX, parentY, donor *individual) {
 			parent, offspring := replace(parentX, parentY)
-			parent.fission(offspring)
+			offspring.fission(parent)
 			parent.mu.Unlock()
-			donor.transfer(offspring)
+			offspring.mutate(donor)
 			donor.mu.Unlock()
-			offspring.mutate()
-			offspring.evaluate(inputs, outputs, total)
+			offspring.evaluate(inputs, outputs)
 			mu.Lock()
 			if offspring.fitness < lowest {
 				lowest = offspring.fitness
