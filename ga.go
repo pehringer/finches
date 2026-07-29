@@ -81,7 +81,7 @@ func (i *individual) mutate(donor *individual) {
 		i.constants[m] += rand.Float64()*0.002 - 0.001
 	case 1:
 		m := rand.Intn(len(i.instructions))
-		i.instructions[m] ^= 1 << rand.Intn(64)
+		i.instructions[m] ^= 1 << rand.Intn(16)
 	case 2:
 		if len(i.instructions) <= 1 {
 			break
