@@ -182,10 +182,11 @@ Additionally, the **selection and replacement operators are designed to slow dow
   + **Selection:** Two neighboring parents are randomly selected from the population. A separate donor individual is also randomly selected from the population.
   + **Replacement:** The parent with the lower fitness score (or if approximately equal, the one with a higher instruction count) is selected to be the new offspring.
   + **Fission:** The offspring's instructions and constants are replaced with a copy of the remaining parent's instructions and constants.
-  + **Mutation:** The offspring then undergoes one of the following random mutations:
+  + **Mutation:** The offspring then undergoes one or more of the following random mutations (based on coin flips):
     * Adjust constant slightly.
-    * Flip instruction bit. 
+    * New random constant.
+    * Flip instruction bit.
+    * Insert new random instruction.
+    * Insert random donor instruction.
     * Remove instruction.
-    * Insert new instruction.
-    * Insert donor instruction.
   + **Evaluation:** The offspring's fitness score is calculated by running a series of test cases. NaN or Infinity results are heavily penalized.

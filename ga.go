@@ -75,21 +75,16 @@ func (i *individual) fission(parent *individual) {
 }
 
 func (i *individual) mutate(donor *individual) {
-	switch rand.Intn(5) {
+	switch rand.Intn(6) {
 	case 0:
 		m := rand.Intn(len(i.constants))
 		i.constants[m] += rand.Float64()*0.002 - 0.001
 	case 1:
+		m := rand.Intn(len(i.constants))
+		i.constants[m] = rand.Float64()*200.0 - 100.0
+	case 2:
 		m := rand.Intn(len(i.instructions))
 		i.instructions[m] ^= 1 << rand.Intn(16)
-	case 2:
-		if len(i.instructions) <= 1 {
-			break
-		}
-		m := rand.Intn(len(i.instructions))
-		head := i.instructions[:m]
-		tail := i.instructions[m+1:]
-		i.instructions = append(head, tail...)
 	case 3:
 		body := []uint16{uint16(rand.Int())}
 		m := rand.Intn(len(i.instructions))
@@ -103,6 +98,17 @@ func (i *individual) mutate(donor *individual) {
 		head := i.instructions[:m]
 		tail := i.instructions[m:]
 		i.instructions = append(head, append(body, tail...)...)
+	case 5:
+		if len(i.instructions) <= 1 {
+			break
+		}
+		m := rand.Intn(len(i.instructions))
+		head := i.instructions[:m]
+		tail := i.instructions[m+1:]
+		i.instructions = append(head, tail...)
+	}
+	if rand.Intn(2) == 0 {
+		i.mutate(donor)
 	}
 }
 
