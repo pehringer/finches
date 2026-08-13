@@ -154,7 +154,7 @@ func evolve(population int, inputs [][]float64, outputs []float64, solutions cha
 			donor.mu.Unlock()
 			offspring.evaluate(inputs, outputs)
 			mu.Lock()
-			if offspring.fitness < lowest {
+			if offspring.fitness <= lowest {
 				lowest = offspring.fitness
 				solutions <- solution{
 					fitness:      100 - offspring.fitness / total * 100,
