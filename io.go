@@ -124,11 +124,8 @@ func write(path string, inputs int, constants []float64, instructions []uint16) 
 			code += fmt.Sprintf("    %s = math.Max(%s, %s)\n", result, first, second)
 		case opcodePW:
 			code += fmt.Sprintf("    %s = math.Pow(%s, %s)\n", result, first, second)
-		case opcodeSQ:
-			code += fmt.Sprintf("    %s = math.Sqrt(%s)\n",  result, first)
-		case opcodeEX:
-			code += fmt.Sprintf("    %s = math.Exp(%s)\n", result, first)
 		case opcodeLG:
+			code += fmt.Sprintf("    %s = math.Log(%s) / math.Log(%s)\n",  result, first, second)
 			code += fmt.Sprintf("    %s = math.Log(%s)\n", result, first)
 		case opcodeSN:
 			code += fmt.Sprintf("    %s = math.Sin(%s)\n", result, first)
@@ -138,6 +135,10 @@ func write(path string, inputs int, constants []float64, instructions []uint16) 
 			code += fmt.Sprintf("    %s = math.Cos(%s)\n", result, first)
 		case opcodeAC:
 			code += fmt.Sprintf("    %s = math.Acos(%s)\n", result, first)
+		case opcodeTN:
+			code += fmt.Sprintf("    %s = math.Tan(%s)\n", result, first)
+		case opcodeAT:
+			code += fmt.Sprintf("    %s = math.Atan(%s)\n", result, first)
 		case opcodeSG:
 			code += fmt.Sprintf("    %s = sigmoid(%s)\n", result, first)
 		case opcodeLT:

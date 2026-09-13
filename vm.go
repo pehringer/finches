@@ -13,13 +13,13 @@ const (
 	opcodeMN    = 0x4000
 	opcodeMX    = 0x5000
 	opcodePW    = 0x6000
-	opcodeSQ    = 0x7000
-	opcodeEX    = 0x8000
-	opcodeLG    = 0x9000
-	opcodeSN    = 0xA000
-	opcodeAS    = 0xB000
-	opcodeCS    = 0xC000
-	opcodeAC    = 0xD000
+	opcodeLG    = 0x7000
+	opcodeSN    = 0x8000
+	opcodeAS    = 0x9000
+	opcodeCS    = 0xA000
+	opcodeAC    = 0xB000
+	opcodeTN    = 0xC000
+	opcodeAT    = 0xD000
 	opcodeSG    = 0xE000
 	opcodeLT    = 0xF000
 	resultShift = 8
@@ -64,12 +64,8 @@ func (r *registers) execute(instruction uint16) {
 		r[result] = math.Max(r[first], r[second])
 	case opcodePW:
 		r[result] = math.Pow(r[first], r[second])
-	case opcodeSQ:
-		r[result] = math.Sqrt(r[first])
-	case opcodeEX:
-		r[result] = math.Exp(r[first])
 	case opcodeLG:
-		r[result] = math.Log(r[first])
+		r[result] = math.Log(r[first]) / math.Log(r[second])
 	case opcodeSN:
 		r[result] = math.Sin(r[first])
 	case opcodeAS:
@@ -78,6 +74,10 @@ func (r *registers) execute(instruction uint16) {
 		r[result] = math.Cos(r[first])
 	case opcodeAC:
 		r[result] = math.Acos(r[first])
+	case opcodeTN:
+		r[result] = math.Tan(r[first])
+	case opcodeAT:
+		r[result] = math.Atan(r[first])
 	case opcodeSG:
 		r[result] = sigmoid(r[first])
 	case opcodeLT:
