@@ -22,22 +22,22 @@ func initialize(population int) []individual {
 	for i := range population {
 		individuals[i].fitness = math.MaxFloat64
 		individuals[i].constants = []float64{
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
-			rand.Float64()*200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
+			rand.Float64() * 200.0 - 100.0,
 		}
 		individuals[i].instructions = []uint16{
 			uint16(rand.Int()),
@@ -78,10 +78,10 @@ func (i *individual) mutate(donor *individual) {
 	switch rand.Intn(6) {
 	case 0:
 		m := rand.Intn(len(i.constants))
-		i.constants[m] += rand.Float64()*0.002 - 0.001
+		i.constants[m] += rand.Float64()* 0.002 - 0.001
 	case 1:
 		m := rand.Intn(len(i.constants))
-		i.constants[m] = rand.Float64()*200.0 - 100.0
+		i.constants[m] = rand.Float64()* 200.0 - 100.0
 	case 2:
 		m := rand.Intn(len(i.instructions))
 		i.instructions[m] ^= 1 << rand.Intn(16)

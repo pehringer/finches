@@ -106,10 +106,11 @@ func write(path string, inputs int, constants []float64, instructions []uint16) 
 		code += fmt.Sprintf("    r[%d], _ = strconv.ParseFloat(os.Args[i+%d], 64)\n", i, i)
 	}
 	for i := range instructions {
-		result := fmt.Sprintf("r[%d]", instructions[i] >> resultShift & shiftMask)
-		first := fmt.Sprintf("r[%d]", instructions[i] >> firstShift & shiftMask)
-		second := fmt.Sprintf("r[%d]", instructions[i] >> secondShift & shiftMask)
-		switch instructions[i] & opcodeMask {
+		second := fmt.Sprintf("r[%d]", instructions[i] >> secondShift & secondMask)
+		first := fmt.Sprintf("r[%d]", instructions[i] >> firstShift & firstMask)
+		result := fmt.Sprintf("r[%d]", instructions[i] >> resultShift & resultMask)
+		opcode := instructions[i] & opcodeMask
+		switch opcode {
 		case opcodeAD:
 			code += fmt.Sprintf("    %s = %s + %s\n", result, first, second)
 		case opcodeSB:
@@ -126,7 +127,6 @@ func write(path string, inputs int, constants []float64, instructions []uint16) 
 			code += fmt.Sprintf("    %s = math.Pow(%s, %s)\n", result, first, second)
 		case opcodeLG:
 			code += fmt.Sprintf("    %s = math.Log(%s) / math.Log(%s)\n",  result, first, second)
-			code += fmt.Sprintf("    %s = math.Log(%s)\n", result, first)
 		case opcodeSN:
 			code += fmt.Sprintf("    %s = math.Sin(%s)\n", result, first)
 		case opcodeAS:

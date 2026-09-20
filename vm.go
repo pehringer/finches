@@ -5,6 +5,15 @@ import (
 )
 
 const (
+	secondShift = 0
+	secondMask  = 0x000F
+
+	firstShift  = 4
+	firstMask   = 0x000F
+
+	resultShift = 8
+	resultMask  = 0x000F
+
 	opcodeMask  = 0xF000
 	opcodeAD    = 0x0000
 	opcodeSB    = 0x1000
@@ -22,10 +31,6 @@ const (
 	opcodeAT    = 0xD000
 	opcodeSG    = 0xE000
 	opcodeLT    = 0xF000
-	resultShift = 8
-	firstShift  = 4
-	secondShift = 0
-	shiftMask   = 0x000F
 )
 
 type registers [16]float64
@@ -45,9 +50,9 @@ func logit(x float64) float64 {
 }
 
 func (r *registers) execute(instruction uint16) {
-	second := int(instruction >> secondShift & shiftMask)
-	first := int(instruction >> firstShift & shiftMask)
-	result := int(instruction >> resultShift & shiftMask)
+	second := int(instruction >> secondShift & secondMask)
+	first := int(instruction >> firstShift & firstMask)
+	result := int(instruction >> resultShift & resultMask)
 	opcode := instruction & opcodeMask
 	switch opcode {
 	case opcodeAD:
