@@ -9,7 +9,7 @@ import (
 type solution struct {
 	fitness      float64
 	constants    []float64
-	instructions []uint16
+	instructions []int
 }
 
 type individual struct {
@@ -39,8 +39,8 @@ func initialize(population int) []individual {
 			rand.Float64() * 200.0 - 100.0,
 			rand.Float64() * 200.0 - 100.0,
 		}
-		individuals[i].instructions = []uint16{
-			uint16(rand.Int()),
+		individuals[i].instructions = []int{
+			rand.Int(),
 		}
 	}
 	return individuals
@@ -71,7 +71,7 @@ func replace(parentX, parentY *individual) (*individual, *individual) {
 
 func (i *individual) fission(parent *individual) {
 	copy(i.constants, parent.constants)
-	i.instructions = append([]uint16(nil), parent.instructions...)
+	i.instructions = append([]int(nil), parent.instructions...)
 }
 
 func (i *individual) mutate(donor *individual) {
@@ -84,16 +84,16 @@ func (i *individual) mutate(donor *individual) {
 		i.constants[m] = rand.Float64()* 200.0 - 100.0
 	case 2:
 		m := rand.Intn(len(i.instructions))
-		i.instructions[m] ^= 1 << rand.Intn(16)
+		i.instructions[m] ^= 1 << rand.Intn(15)
 	case 3:
-		body := []uint16{uint16(rand.Int())}
+		body := []int{rand.Int()}
 		m := rand.Intn(len(i.instructions))
 		head := i.instructions[:m]
 		tail := i.instructions[m:]
 		i.instructions = append(head, append(body, tail...)...)
 	case 4:
 		n := rand.Intn(len(donor.instructions))
-		body := []uint16{donor.instructions[n]}
+		body := []int{donor.instructions[n]}
 		m := rand.Intn(len(i.instructions))
 		head := i.instructions[:m]
 		tail := i.instructions[m:]
@@ -159,7 +159,7 @@ func evolve(population int, inputs [][]float64, outputs []float64, solutions cha
 				solutions <- solution{
 					fitness:      100 - offspring.fitness / total * 100,
 					constants:    append([]float64(nil), offspring.constants...),
-					instructions: append([]uint16(nil), offspring.instructions...),
+					instructions: append([]int(nil), offspring.instructions...),
 				}
 			}
 			mu.Unlock()

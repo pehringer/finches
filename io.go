@@ -67,14 +67,6 @@ import "fmt"
 import "math"
 import "strconv"
 
-func sigmoid(x float64) float64 {
-  return 1.0 / (1.0 + math.Exp(-x))
-}
-
-func logit(x float64) float64 {
-  return math.Log(x / (1 - x))
-}
-
 var r = [16]float64{
   %f,
   %f,
@@ -94,13 +86,27 @@ var r = [16]float64{
   %f,
 }
 
+func mix(x, y, w float64) float64 {
+  if w >= 1.0 {
+    return y
+  }
+  if w <= 0.0 {
+    return x
+  }
+  return (1.0 - w) * x + w * y
+}
+
+func sig(x, y float64) float64 {
+  return 1.0 / (1.0 + math.Exp(x - y))
+}
+
 func main() {
   for i := 1; i < len(os.Args); i += %d {
 %s  }
   fmt.Println(r[15])
 }`
 
-func write(path string, inputs int, constants []float64, instructions []uint16) error {
+func write(path string, inputs int, constants []float64, instructions []int) error {
 	code := ""
 	for i := range inputs {
 		code += fmt.Sprintf("    r[%d], _ = strconv.ParseFloat(os.Args[i+%d], 64)\n", i, i)
@@ -111,38 +117,22 @@ func write(path string, inputs int, constants []float64, instructions []uint16) 
 		result := fmt.Sprintf("r[%d]", instructions[i] >> resultShift & resultMask)
 		opcode := instructions[i] & opcodeMask
 		switch opcode {
-		case opcodeAD:
+		case opcodeADD:
 			code += fmt.Sprintf("    %s = %s + %s\n", result, first, second)
-		case opcodeSB:
+		case opcodeSUB:
 			code += fmt.Sprintf("    %s = %s - %s\n", result, first, second)
-		case opcodeML:
+		case opcodeMUL:
 			code += fmt.Sprintf("    %s = %s * %s\n", result, first, second)
-		case opcodeDV:
+		case opcodeDIV:
 			code += fmt.Sprintf("    %s = %s / %s\n", result, first, second)
-		case opcodeMN:
-			code += fmt.Sprintf("    %s = math.Min(%s, %s)\n", result, first, second)
-		case opcodeMX:
+		case opcodeMAX:
 			code += fmt.Sprintf("    %s = math.Max(%s, %s)\n", result, first, second)
-		case opcodePW:
-			code += fmt.Sprintf("    %s = math.Pow(%s, %s)\n", result, first, second)
-		case opcodeLG:
-			code += fmt.Sprintf("    %s = math.Log(%s) / math.Log(%s)\n",  result, first, second)
-		case opcodeSN:
-			code += fmt.Sprintf("    %s = math.Sin(%s)\n", result, first)
-		case opcodeAS:
-			code += fmt.Sprintf("    %s = math.Asin(%s)\n", result, first)
-		case opcodeCS:
-			code += fmt.Sprintf("    %s = math.Cos(%s)\n", result, first)
-		case opcodeAC:
-			code += fmt.Sprintf("    %s = math.Acos(%s)\n", result, first)
-		case opcodeTN:
-			code += fmt.Sprintf("    %s = math.Tan(%s)\n", result, first)
-		case opcodeAT:
-			code += fmt.Sprintf("    %s = math.Atan(%s)\n", result, first)
-		case opcodeSG:
-			code += fmt.Sprintf("    %s = sigmoid(%s)\n", result, first)
-		case opcodeLT:
-			code += fmt.Sprintf("    %s = logit(%s)\n", result, first)
+		case opcodeMIN:
+			code += fmt.Sprintf("    %s = math.Min(%s, %s)\n", result, first, second)
+		case opcodeMIX:
+			code += fmt.Sprintf("    %s = mix(%s, %s, %s)\n", result, result, first, second)
+		case opcodeSIG:
+			code += fmt.Sprintf("    %s = sig(%s, %s)\n",  result, first, second)
 		}
 	}
 	program := fmt.Sprintf(programFormat,

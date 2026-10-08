@@ -122,20 +122,20 @@ Finches, however, **employs branchless programming techniques for its control fl
 This approach integrates control flow directly into computations.
 By avoiding explicit branching, LGP can incrementally evolve conditional flow logic through symbolic regression, resulting in a significantly smoother solution landscape.
 
-Furthermore, this ISA **only contains smooth continuous functions for selection logic** (such as minimum, maximum, and sigmoid).
+Furthermore, this ISA **only contains smooth continuous functions for selection logic** (maximum, minimum, mix, sig).
 This design choice provides a more incremental and continuous path for forming control flow logic when compared to all-or-nothing boolean operations (like AND, OR, NOT), further contributing to a smoother solution landscape.
 
-Finally, the **inclusion of inverse operations** (e.g., addition and subtraction, multiplication and division, minimum and maximum) creates a more uniform and balanced search space.
+Finally, the **inclusion of inverse operations** (addition and subtraction, multiplication and division, minimum and maximum) creates a more uniform and balanced search space.
 This allows instructions to be effectively "undone" or counteracted, which further contributes to a smoother solution landscape and enhances finches ability to explore.
 
-These design choices, including the **compact uniform 16-bit instruction format** (where all bit combinations map to valid instructions), collectively contribute to a significantly reduced search space for LGP to explore.
+These design choices, including the **compact uniform 15-bit instruction format** (where all bit combinations map to valid instructions), collectively contribute to a significantly reduced search space for LGP to explore.
 By constraining these architectural dimensions, finches can more efficiently navigate the solution landscape, making the evolutionary process faster.
 
 ### Instruction Format:
 
 |OPCODE |RESULT|FIRST|SECOND|
 |-------|------|-----|------|
-|[15-12]|[11-8]|[7-4]|[3-0] |
+|[14-12]|[11-8]|[7-4]|[3-0] |
 
 ### Instruction Set:
 
@@ -145,24 +145,33 @@ This allows for continued program execution instead of program termination.
 **NOTE:** Constants are preloaded into the registers before program execution.
 This eliminates the need for special registers and allows for uniform register access.
 
-|OPCODE|Mnemonic|Pseudocode                                                     |
-|------|--------|---------------------------------------------------------------|
-|0000  |AD      |register[RESULT] = register[FIRST] + register[SECOND]          |
-|0001  |SB      |register[RESULT] = register[FIRST] - register[SECOND]          |
-|0010  |ML      |register[RESULT] = register[FIRST] * register[SECOND]          |
-|0011  |DV      |register[RESULT] = register[FIRST] / register[SECOND]          |
-|0100  |MN      |register[RESULT] = min(register[FIRST], register[SECOND])      |
-|0101  |MX      |register[RESULT] = max(register[FIRST], register[SECOND])      |
-|0110  |PW      |register[RESULT] = pow(register[FIRST], register[SECOND])      |
-|0111  |LG      |register[RESULT] = log(register[FIRST]) / log(register[SECOND])|
-|1000  |SN      |register[RESULT] = sin(register[FIRST])                        |
-|1001  |AS      |register[RESULT] = asin(register[FIRST])                       |
-|1010  |CS      |register[RESULT] = cos(register[FIRST])                        |
-|1011  |AC      |register[RESULT] = acos(register[FIRST])                       |
-|1100  |TN      |register[RESULT] = tan(register[FIRST])                        |
-|1101  |AT      |register[RESULT] = atan(register[FIRST])                       |
-|1110  |SG      |register[RESULT] = sigmoid(register[FIRST])                    |
-|1111  |LT      |register[RESULT] = logit(register[FIRST])                      |
+|OPCODE|Mnemonic|Pseudocode                                                                 |
+|------|--------|---------------------------------------------------------------------------|
+|000   |ADD     |register[RESULT] = register[FIRST] + register[SECOND]                      |
+|001   |SUB     |register[RESULT] = register[FIRST] - register[SECOND]                      |
+|010   |MUL     |register[RESULT] = register[FIRST] * register[SECOND]                      |
+|011   |DIV     |register[RESULT] = register[FIRST] / register[SECOND]                      |
+|100   |MAX     |register[RESULT] = max(register[FIRST], register[SECOND])                  |
+|101   |MIN     |register[RESULT] = min(register[FIRST], register[SECOND])                  |
+|110   |MIX     |register[RESULT] = mix(register[RESULT], register[FIRST], register[SECOND])|
+|111   |SIG     |register[RESULT] = sig(register[FIRST], register[SECOND])                  |
+
+```
+mix(x, y, w) {
+  if w >= 1 {
+    return y
+  }
+  if w <= 0 {
+    return x
+  }
+  return (1 - w) * x + w * y
+}
+```
+```
+sig(x, y) {
+  return 1 / (1 + exp(x - y))
+}
+```
 
 # Finches Genetic Algorithm (GA)
 
