@@ -111,6 +111,6 @@ func main() {
 		if err != nil {
 			exitError(err)
 		}
-		fmt.Printf("%s %f%% %v\n", destination, solution.fitness, time.Now())
+		fmt.Printf("%s %v%% %v\n", destination, solution.fitness, time.Now())
 	}
 }

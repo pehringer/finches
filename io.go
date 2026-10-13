@@ -68,22 +68,22 @@ import "math"
 import "strconv"
 
 var r = [16]float64{
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
-  %f,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
+  %v,
 }
 
 func mix(x, y, w float64) float64 {

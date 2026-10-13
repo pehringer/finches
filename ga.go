@@ -63,7 +63,7 @@ func replace(parentX, parentY *individual) (*individual, *individual) {
 	if parentY.fitness - parentX.fitness > 0.001 {
 		return parentX, parentY
 	}
-	if len(parentX.instructions) > len(parentY.instructions) {
+	if len(parentX.instructions) >= len(parentY.instructions) {
 		return parentY, parentX
 	}
 	return parentX, parentY
