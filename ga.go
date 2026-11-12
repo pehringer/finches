@@ -100,7 +100,8 @@ func (i *individual) mutate(donor *individual) {
 		i.instructions = append(head, append(body, tail...)...)
 	case 5:
 		if len(i.instructions) <= 1 {
-			break
+			i.mutate(donor)
+			return
 		}
 		m := rand.Intn(len(i.instructions))
 		head := i.instructions[:m]
